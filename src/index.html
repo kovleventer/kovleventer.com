@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Kovleventer</title>
+		<link rel="stylesheet" type="text/css" href="style_red.css">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>Products and downloads</h1>
+		<p>This page contains general information and download links for stuff I made or maintain.</p>
+			
+			
+			<h2 class="dropdown" onclick="toggle('androhart')">HART tools for Android™</h2>
+			<div class="hideable" id="androhart">
+			<h3>AndroHART</h3>
+			<p><a href="https://fieldcommgroup.org/technologies/hart">HART</a> communicator for Android. Allows basic communication and configuration of field devices through the HART protocol and USB, which needs OTG functionality. The most used universal and common practice commands are supported, which includes poll adress setting, message and tag configuring, range tuning and periodical data registering.</p>
+			<p>In the free (lite) version, most commands, which involve writing info back to the field device are limited. (But reading works pretty much the same.)</p>
+			<p><a href="https://play.google.com/store/apps/details?id=com.kovlev.androhart">
+				AndroHART on Google Play</a></p>
+			<p><a href="https://play.google.com/store/apps/details?id=com.kovlev.androhartlite">
+				AndroHARTLite (free) on Google Play</a></p>
+			<p>Or if you prefer not to use Google Play: </p>
+			<p><a href="content/binary/AndroHART_Lite 1.3.0.apk">
+				AndroHARTLite .apk file (1.3.0)</a></p>
+			<p>Documentation is available in English and Hungarian (pro and lite versions share the same document):</p>
+			<p><a href="content/docs/AndroHART_manual_EN.pdf">
+				AndroHART Documentation EN (slightly outdated)</a></p>
+			<p><a href="content/docs/AndroHART_manual_HU.pdf">
+				AndroHART Documentation HU</a></p>
+			
+			<h3>Android HART slaves</h3>
+			<p>These programs are capable of acting as a field device, and can communicate through switchable and configurable burst / multidrop (request-answer) mode with command 01, 02 or 03. Values and meta information can be set and saved to multiple config files. Communication is limited to USB serial communication, no wireless option is available.</p>
+			<p>These applications can be useful when testing components in a measurement system or when verifying that the communication is set up properly.</p>
+			<p><a href="https://play.google.com/store/apps/details?id=com.kovlev.androhartburstslave">
+				AndroHART Burst Slave on Google Play</a></p>
+			<p><a href="https://play.google.com/store/apps/details?id=com.kovlev.androhartmultidropslave">
+				AndroHART Multidrop Slave on Google Play</a></p>
+			<p>Documentation is available in English and Hungarian:</p>
+			<p><a href="content/docs/AndroHART_BurstSlave_manual_EN.pdf">
+				AndroHART Burst Slave Documentation EN</a></p>
+			<p><a href="content/docs/AndroHART_BurstSlave_manual_HU.pdf">
+				AndroHART Burst Slave Documentation HU</a></p>
+			<p><a href="content/docs/AndroHART_MultidropSlave_manual_EN.pdf">
+				AndroHART Multidrop Slave Documentation EN</a></p>
+			<p><a href="content/docs/AndroHART_MultidropSlave_manual_HU.pdf">
+				AndroHART Multidrop Slave Documentation HU</a></p>
+			
+			<p class="legal">Google Play and the Google Play logo are trademarks of Google LLC. Android is a trademark of Google LLC.<p>
+			</div>
+			
+			
+			<h2 class="dropdown" onclick="toggle('iapws')">IAPWS-IF97 calculator for Android</h2>
+			<div class="hideable" id="iapws">
+			<p>Android app to calucate water and steam properties with. Uses the IAPWS-IF97 formulation. Requires Android version 2.3 or later (Gingerbread, API level 9)</p>
+			<p><a href="https://play.google.com/store/apps/details?id=com.kovlev.iapws_if97">
+				<span class="font-icon-b"><?php echo $GooglePlay?></span>
+				Get it on Google Play</a></p>
+			<p>Free and open source software licensed under the MIT license</p>
+			<p><a href="content/binary/IAPWS_IF97props 1.0.6.apk">
+				<span class="font-icon-b"><?php echo $Android?></span>
+				Download .apk file (version 1.0.6)</a></p>
+			<p><a href="https://github.com/kovleventer/IAPWS-IF97-Android">
+				<span class="font-icon-b"><?php echo $Github?></span>
+				View source code</a></p>
+			<p class="legal">Google Play and the Google Play logo are trademarks of Google LLC. Android is a trademark of Google LLC.<p>
+			
+			</div>
+			
+			
+			<h2 class="dropdown" onclick="toggle('timestampbackup')">TimeStamp Backup extension for LibreOffice</h2>
+			<div class="hideable" id="timestampbackup">
+			<p>This extension for LibreOffice and OpenOffice enables the user to make a normal save and to additionally create a timestamped backup copy of the document with just one click.</p>
+			<p><a href="https://wiki.documentfoundation.org/Documentation/HowTo/install_extension">Installation guide</a></p>
+			<p><a href="https://extensions.libreoffice.org/extensions/timestamp-backup">
+				<span class="font-icon-r"><?php echo $File?></span>
+				Get it from the official extension site</a></p>
+			<p>License: GPL v3</p>
+			<p><a href="content/binary/timeStampBackup_v1-1-8.oxt">
+				<span class="font-icon-r"><?php echo $Archive?></span>
+				Download extension (.oxt) file (version 1.1.8)</a></p>
+			<p><a href="https://github.com/kovleventer/timeStampBackup">
+				<span class="font-icon-b"><?php echo $Github?></span>
+				View source code</a></p>
+			</div>
+	</article>
+	<script src="utilities.js" type="text/javascript"></script>
+</body>
+</html>

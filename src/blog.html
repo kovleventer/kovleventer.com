@@ -1,0 +1,17 @@
+ <!DOCTYPE html>
+
+<html>
+<head>
+	<title>Kovleventer</title>
+		<link rel="stylesheet" type="text/css" href="style_blue.css">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		 <h1>Some stuff</h1>
+		 {% for entry in entries %}
+			<p class="entry"><span class="date">{{ entry.date }}</span><a href="{{ entry.link }}">{{ entry.name }}</a></p>
+		 {% endfor %}
+	</article>
+</body>
+</html>
