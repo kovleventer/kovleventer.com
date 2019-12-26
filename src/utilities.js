@@ -1,4 +1,4 @@
 function toggle(id) {
-    var div = document.getElementById(id);
-    div.style.display = div.style.display == "block" ? "none" : "block";
+    var element = document.getElementById(id);
+    element.style.display = element.style.display == "block" ? "none" : "block";
 }

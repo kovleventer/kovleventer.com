@@ -8,6 +8,7 @@ body {
 	margin: 0;
     font-family: Helvetica, sans-serif;
 	color: $dark-color;
+	background-color: $light-color;
 	
 	// Header bar
 	nav {
@@ -121,6 +122,51 @@ body {
 
 		.entry {
 			font-size: 22px;
+		}
+		
+		figure {
+			border-style: solid;
+			border-color: $mid-color;
+			padding: 10px;
+			border-radius: 10px;
+			border-width: 1px;
+			margin: 0;
+			
+			canvas {
+				display: block;
+				margin: auto;
+			}
+		}
+		
+		input[type=range] {
+			height: 10px;
+			background: $mid-color;
+			outline: none;
+			opacity: 0.7;
+			border-radius: 10px;
+			
+			&::-moz-range-thumb {
+				width: 25px;
+				height: 25px;
+				border-radius: 50%; 
+				background: $active-color;
+				outline: none;
+			}
+			
+			// https://stackoverflow.com/questions/18794026/remove-dotted-outline-from-range-input-element-in-firefox
+			&::-moz-focus-outer {
+				border: 0;
+			}
+			
+			&:hover {
+				opacity: 1;
+			}
+		}
+		
+		input[type=checkbox] {
+			width: 25px;
+			height: 25px;
+			background-color: $mid-color;
 		}
 	}
 	

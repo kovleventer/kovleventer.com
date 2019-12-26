@@ -23,7 +23,8 @@ def get_blog_entries():
         if os.path.exists(config):
             with open(config) as f:
                 cfg = yaml.load(f)
-                entries.append({"name": cfg['name'], "date": cfg['date'], "link": "blog/" + entry.split("/")[-1]})
+                if cfg["published"]:
+                    entries.append({"name": cfg['name'], "date": cfg['date'], "link": "blog/" + entry.split("/")[-1]})
         else:
             print("Warning: no config file found for", entry)
 
