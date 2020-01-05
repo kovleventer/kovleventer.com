@@ -20,9 +20,8 @@ std::vector<CFMatrix> dftMatrices;
 [[cheerp::genericjs]] Canvas canvas1;
 [[cheerp::genericjs]] client::HTMLInputElement *range, *checkb;
 
-int padding = 20;
 int size = 60;
-int totalSize = padding * 2 + size * MAX_MATRIX_SIZE;
+int totalSize = size * MAX_MATRIX_SIZE;
 bool colored = false;
 
 [[cheerp::genericjs]]
@@ -34,14 +33,14 @@ void render() {
 	
 	for (int y = 0; y < matrix.getY(); y++) {
 		for (int x = 0; x < matrix.getX(); x++) {
-			canvas1.drawRect(padding + x * size, padding + y * size, size, size, Color::BLACK);
+			canvas1.drawRect(x * size, y * size, size, size, Color::BLACK);
 			Complex<float> value = matrix.get(x, y);
 			if (colored) {
-				canvas1.fillRect(padding + x * size, padding + y * size, size, size, Color::angleToColor(value.getArg()));
+				canvas1.fillRect(x * size, y * size, size, size, Color::angleToColor(value.getArg()));
 			}
 			std::stringstream stream;
 			stream << std::fixed << std::setprecision(2) << value.getArg();
-			canvas1.drawText(stream.str().c_str(), padding + x * size + 5, padding + y * size + size / 2 + 10, Color::BLACK);
+			canvas1.drawText(stream.str().c_str(), x * size + 5, y * size + size / 2 + 10, Color::BLACK);
 		}
 	}
 	

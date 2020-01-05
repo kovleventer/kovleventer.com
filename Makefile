@@ -18,7 +18,7 @@ STYLES := $(shell find src -type f -name style_*.scss)
 BUILD_STYLES := $(patsubst %.scss, %.css, $(patsubst src/style%, build%,$(STYLES)))
 
 
-all: html $(BUILD_STYLES) $(BLOG_HTMLS) $(BLOG_JS) $(BLOG_MEDIA) $(BLOG_WASM)
+all: | html $(BUILD_STYLES) $(BLOG_HTMLS) $(BLOG_MEDIA) $(BLOG_JS) $(BLOG_WASM) 
 
 build/%.css: src/style/%.scss src/style/style.scss
 	$(SCSS_COMPILER) $< $@
@@ -31,20 +31,19 @@ html:
 	cp src/favicon.ico build/favicon.ico
 
 BLOG_TEMPLATE_COMPILER := src/blog/blog_gen.py
-build/blog/%index.html: src/blog/%index.html build/blog/%
-	echo $*
-	# TODO something bad happens here
+build/blog/%index.html: src/blog/%index.html src/blog/% $(BLOG_TEMPLATE_COMPILER)
+	mkdir -p build/blog/$* # TODO fix this redundancy
 	$(PYTHON_3) $(BLOG_TEMPLATE_COMPILER) src/blog/$*
 	
-	
 LIB_FILES = $(shell find src/lib -type f -name *.hpp)
-build/blog/%script.wasm: src/blog/%script.cpp build/blog/% $(LIB_FILES)
+build/blog/%script.wasm: src/blog/%script.cpp $(LIB_FILES) #build/blog/%
+	mkdir -p build/blog/$*
 	$(CHEERP) $(CHEERP_FLAGS) -cheerp-wasm-loader=$(patsubst %.wasm,%.js,$@) -o $@ $<
-	#$(CHEERP) $(CHEERP_FLAGS) -o $(patsubst %.wasm,%.js,$@) -cheerp-wasm-file=$@ $<
 	
 build/blog/%script.js: build/blog/%script.wasm
 	
-build/blog/%media: src/blog/%media build/blog/%
+build/blog/%media: src/blog/%media
+	mkdir -p build/blog/$*
 	cp -r $< $@
 
 # Empty rules
@@ -52,8 +51,8 @@ build/blog/%script.js:;
 build/blog/%script.wasm:;
 build/blog/%media:;
 
-build/blog/%/:
-	mkdir -p $@
+#build/blog/%/:
+	#mkdir -p $@
 
 clean:
 	rm -rf build
