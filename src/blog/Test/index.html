@@ -9,9 +9,9 @@
 <body>
 	{% include "header.html" %}
 	<article>
-        <h1>{{ title }}</h1>
-        <figure>
-			<canvas id="dft_matrices"></canvas>
+		<h1>{{ title }}</h1>
+		<figure>
+			<canvas id="dft_matrices"/>
 			<input type="range" id="dft_size" min="1" max="10" value="1">
 			<input type="checkbox" id="dft_colored">
 			<label for="dft_colored">Colored</label>
@@ -23,7 +23,7 @@
 		
 		{{ formula("example_formula.tex") }}
 		
-    </article>
-    <script src="script.js"></script>
+	</article>
+	<script src="script.js"></script>
 </body>
 </html>

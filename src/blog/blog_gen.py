@@ -9,6 +9,7 @@ from pygments.lexers import guess_lexer
 
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.offsetbox import AnchoredOffsetbox, TextArea, HPacker
 from io import BytesIO
 
 folder = sys.argv[1]
@@ -20,14 +21,16 @@ def syntax_file(filename):
     return highlight(content, guess_lexer(content), HtmlFormatter(cssclass="code_highlight"))
 
 matplotlib.rcParams['text.usetex'] = True
-def render_tex(filename):
+matplotlib.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
+def render_tex(filename, fontsize=24):
     filename = os.path.join(folder, filename)
     content = open(filename).read()[:-1] # New line at the end
     fig = plt.figure(figsize=(0.01, 0.01))
-    fig.text(0, 0, content, fontsize=24)
+    fig.text(0, 0, content, fontsize=fontsize)
 
-    output = BytesIO()
-    fig.savefig(output, dpi=300,
+    svg = filename.replace("src", "build")
+    svg = svg.replace(".tex", ".svg")
+    fig.savefig(svg, dpi=300,
                 transparent=True,
                 format='svg',
                 bbox_inches='tight',
@@ -36,11 +39,6 @@ def render_tex(filename):
                 )
     plt.close(fig)
 
-    output.seek(0)
-    svg = filename.replace("src", "build")
-    svg = svg.replace(".tex", ".svg")
-    with open(svg, "wb") as f:
-        f.write(output.read()) # Using BytesIO makes no sense now
     svg = svg.split("/")[-1]
     return '<img class="formula" src="' + svg + '">'
 

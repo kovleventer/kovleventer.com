@@ -49,5 +49,10 @@ public:
 	void clear() {
 		canvasCtx->clearRect(0, 0, width, height);
 	}
+	
+	// Unsafe hack so delete this latert TODO
+	client::HTMLCanvasElement* _getUnderlyingCanvas() {
+		return canvas;
+	}
 };
 

@@ -1,6 +1,7 @@
 $dark-color: #222222;
 $mid-color: #919191;
 $light-color: #F0F0F0;
+$slightly-darker-than-light: #CFCFCF;
 $white: #FFFFFF;
 
 $default-font-size: 20px;
@@ -113,6 +114,7 @@ body {
 			color: $active-color;
 			font-weight: bold;
 			text-decoration: none;
+			cursor: pointer;
 			&:hover {
 				text-decoration: underline;
 			}
@@ -174,10 +176,29 @@ body {
 			background-color: $mid-color;
 		}
 		
-		.formula {
+		
+		
+		img {
+			max-width: 100%;
+			max-height: 450px;
+			width: auto;
+			height: auto;
 			display: block;
 			margin-left: auto;
 			margin-right: auto;
+		}
+		
+		.mono {
+			font-family: Hack, Monaco, monospace;
+			background-color: $slightly-darker-than-light;
+			padding: 10px;
+			font-size: ($default-font-size - 2);
+		}
+		
+		ul {
+			li {
+				margin-bottom: 10px;
+			}
 		}
 		
 		.code_highlight {
@@ -275,6 +296,9 @@ body {
 				.il { color: #666666 } /* Literal.Number.Integer.Long */
 			}
 		}
+		
+		.plt_red { color: #FF0000; }
+		.plt_blue { color: #1f77b4; }
 	}
 	
 	

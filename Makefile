@@ -44,7 +44,7 @@ build/blog/%script.js: build/blog/%script.wasm
 	
 build/blog/%media: src/blog/%media
 	mkdir -p build/blog/$*
-	cp -r $< $@
+	cp -r $< build/blog/$*
 
 # Empty rules
 build/blog/%script.js:;
