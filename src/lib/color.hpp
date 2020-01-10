@@ -12,6 +12,14 @@ namespace Color {
 	const int YELLOW = 0xFFFF00;
 	const int WHITE = 0xFFFFFF;
 	
+	const int MAT_RED_50 = 0xffebee;
+	const int MAT_CYAN_50 = 0xe0f7fa;
+	const int MAT_GREEN_50 = 0xf1f8e9;
+	
+	const int MAT_RED_300 = 0xe57373;
+	const int MAT_CYAN_300 = 0x4dd0e1;
+	const int MAT_GREEN_300 = 0x81c784;
+	
 	int rgbToColor(int r, int g, int b) {
 		return (r << 16) | (g << 8) | b;
 	}

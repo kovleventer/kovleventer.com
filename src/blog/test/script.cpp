@@ -1,10 +1,10 @@
 #include <cheerp/clientlib.h>
 #include <cheerp/client.h>
 
-#include "htmlcanvas.hpp"
-#include "htmlinput.hpp"
-#include "matrix.hpp"
-#include "complex.hpp"
+#include "html2/canvas.hpp"
+#include "html2/input.hpp"
+#include "math/matrix.hpp"
+#include "math/complex.hpp"
 #include "color.hpp"
 
 #include <vector>
@@ -40,7 +40,7 @@ void render() {
 			}
 			std::stringstream stream;
 			stream << std::fixed << std::setprecision(2) << value.getArg();
-			canvas1.drawText(stream.str().c_str(), x * size + 5, y * size + size / 2 + 10, Color::BLACK);
+			canvas1.drawText(stream.str().c_str(), x * size + 5, y * size + size / 2 + 10, Color::BLACK, "start", "alphabetic");
 		}
 	}
 	

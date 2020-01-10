@@ -15,7 +15,7 @@
 		
 		<h2>Motivation</h2>
 		
-		<p>The motivation behind Fourier transforms is pretty simple: <i>you want to find out what sinusoidal components your signal has, and retrieve their respective amplitudes and frequencies</i>. This is indeed simple if you have already worked with such stuff, but it raises a lot of questions for a complete beginner. What is a signal? Why do I want to find its frequencies? Why do I use sines and cosines to accomplish this? How do I do this? To make everything clear, let's answer those questions. Or you can <a href="#skip">skip</a> this part.</p>
+		<p>The motivation behind Fourier transforms is pretty simple: <i>you want to find out what sinusoidal components your signal has, and retrieve their respective amplitudes and frequencies</i>. This is indeed simple if you have already worked with such stuff, but it raises a lot of questions for a complete beginner. What is a signal? Why do I want to find its frequencies? Why do I use sines and cosines to accomplish this? To make everything clear, let's answer those questions. Or you can <a href="#skip">skip</a> this part.</p>
 		
 		<p><b>Signal</b>s are usually divided into four categories by two main characteristics. They can be discrete or continous in time (the domain) and similarly have discrete or continous values (the codomain). For now, making a distinction in the codomain serves no purpose, so we are left with two groups.</p>
 		
@@ -25,9 +25,9 @@
 		
 		<p><span class="mono">[(0.4, 1.17), (1.15, 2.74), (1.9, 2.84), (2.65, 1.42), (3.4, -0.77)]</span></p>
 		
-		<p>The <span class="plt_red">red line</span> represents a more abstract signal (3*sin(x) in this case). It is defined for every x, but dealing with concrete values gets harder as the functions composing the signal get more complex. At first glance it may seem, that the blue signal samples the red one, as it fits perfectly in those points, but <a onclick="hi_freq()">why would that be the case</a>? (<a onclick="lo_freq()">revert</a>)</p>
+		<p>The <span class="plt_red">red line</span> represents a more abstract signal (3*sin(x) in this case). It is defined for every x, but dealing with concrete values gets harder as the functions composing the signal get more complex. At first glance it may seem that the blue signal samples the red one, as it fits perfectly in those points, but <a onclick="hi_freq()">why would that be the case</a>? (<a onclick="lo_freq()">revert</a>)</p>
 		
-		<p>It seems abstract functions would serve a purpose in inter- and extrapolating values, if they would be unequivocally deducable. Without diving into the realm of interpolation we can say that there won't be a bijection between discrete and continous signals, but also that the <a onclick="lo_freq()">first signal</a> <i>clearly</i> fits our measurements more, where 'clearly' here remains an ambigous term for now.</p>
+		<p>It seems abstract functions would serve a purpose in inter- and extrapolating values, if they would be unequivocally deducable. Without diving into the realm of interpolation we can say that there won't be a bijection between discrete and continous signals, but also that the <a onclick="lo_freq()">first signal</a> <i>clearly</i> fits our measurements more, where 'clearly' remains an ambigous term for now.</p>
 		
 		<p>There are also two things worth mentioning about the <span class="plt_blue">blue signal:</span></p>
 		
@@ -42,9 +42,9 @@
 		
 		<p>Also the array form is trivialized even more, no need to store indices anymore:</p>
 		
-		<p><span class="mono">[1.17, 2.74, 2.84, 1.42, -0.77]</p></p>
+		<p><span class="mono">[1.17, 2.74, 2.84, 1.42, -0.77]</span></p>
 		
-		<p><b>Why do I use sines and cosines?</b> Firstly they are periodic functions. You might say a <a href="https://en.wikipedia.org/wiki/Square_wave">square wave</a> is periodic as well and way easier to make calculations with. But these signals are often pushed through integration and derivation steps, and it is rare to find such function that can survive these methods without minor alterations. Sine derives into cosine, and vica versa with a factor of -1, thus making repeated derivation return the original function after four steps. <a href="https://en.wikipedia.org/wiki/Exponential_function">Exponential</a> and <a href="https://en.wikipedia.org/wiki/Hyperbolic_function">hyperbolic</a> functions also have this property (and are closely related), but they are not periodic in the real domain. A flat constant zero function satisfies both properties, but is completely uninteresting.</p>
+		<p>And lastly, <b>Why do I use sines and cosines?</b> Firstly they are periodic functions. You might say a <a href="https://en.wikipedia.org/wiki/Square_wave">square wave</a> is periodic as well and way easier to make calculations with. But these signals are often pushed through integration and derivation steps, and it is rare to find such function that can survive these methods without minor alterations. Sine derives into cosine, and vica versa with a factor of -1, thus making repeated derivation return the original function after four steps. <a href="https://en.wikipedia.org/wiki/Exponential_function">Exponential</a> and <a href="https://en.wikipedia.org/wiki/Hyperbolic_function">hyperbolic</a> functions also have this property (and are closely related), but they are not periodic in the real domain. A flat constant zero function satisfies both properties, but is completely uninteresting.</p>
 		
 		<h2 id="skip">Synthesis and analysis</h2>
 		
@@ -54,7 +54,7 @@
 		
 		<p>The 2 * π * f part is often abbreviated as ω (greek small omega), but we'll stick with the 2πf notation.</p>
 		
-		<p>We can build more complex signals by summing some of these cosine signals (with different frequencies and amplitudes).</p>
+		<p>We can build more complex signals by summing some of these cosines (with different frequencies and amplitudes).</p>
 		
 		{{ formula("sum_cosine.tex", 20) }}
 		
@@ -64,21 +64,33 @@
 		
 		<img src="media/synthesis_example.png">
 		
-		<p>Instead of preceiving this signal as a sum, we can treat that as an <b>inner product</b> of two vectors, one being the amplitudes, and the other the cosine terms.</p>
+		<p>Instead of preceiving this signal as a sum, we can treat it as an <b>inner product</b> of two vectors, one being the amplitudes, and the other the cosine terms.</p>
 		
 		{{ formula("synthesis_vectors.tex", 28) }}
 		
-		<p>What do we gain from that? Nothing, as long as we are plugging our <i>x</i>-es to this function one by one. But generally, if this signal is a generator, we are going to take more than one sample. With multiple <i>x</i>-es and frequencies the cos vector expands into a <b>matrix</b> and we have a matrix-vector multiplication.</p>
+		<p>What do we gain from that? Nothing, as long as we are plugging our <i>x</i>-es to this function one by one. But generally, if this signal is a generator, we are going to take more than one sample. With multiple <i>x</i>-es and frequencies the cosine vector expands into a <b>matrix</b> and now we have a matrix-vector multiplication.</p>
 		
 		{{ formula("synthesis_matrix.tex", 24) }} <!-- TODO extra space added at the right somewhy -->
 		
-		<p>Maybe it is more clear with a different notation:</p>
+		<p>Maybe it is more clear with a different notation (hover on result elements to see the inner products):</p>
 		
 		<figure>
-			<canvas id="synthesis_matrix"/>
+			<canvas id="synthesis_matrix"></canvas>
 		</figure>
 		
+		<p>This step is called <b>synthesis</b> where the result signal is built from our base components. The reverse of this is <b>analysis</b> where we know the frequencies and the result signal (the samples in our case) and the variables under question are the amplitudes. If you are familiar with <a href="https://en.wikipedia.org/wiki/Gaussian_elimination">Gaussian elimination</a>, you already know the next step, if not, read it up. Basically we have three equatations for three unknown variables (A1, A2, A3). The cosine terms might look scary, but since all of their variables are constant, the terms themselves will be constant as well. We can sample a continous signal as many times as we want, but it is easy to see that we need at least as many samples as many frequencies we have; and that further samples add no information to our system of equatations.
 		
+		<p>Well, the above sentence is not entirely true, there are edge cases, where even though we have three equatations, the system won't be solvable. If a column is full of zeroes, or two columns are equal, our solution will be ambigous. This translates nicely into the world of signals, if two our frequencies sync with the sampling frequency, they are going to measure the same value each time. With a sampling rate of 1 and two integer frequencies, we will never find a solution. Also a full zero column tells us nothing about the amplitude, as seen below:</p>
+		
+		<figure>
+			<video autoplay loop>
+			<source src="media/analysis_zeros.mp4" type="video/mp4">
+			</video>
+		</figure>
+		
+		<p>Instead of solving a linear system of equatations each time, we can get the same result by taking the <b>inverse</b> of this cosine matrix. The edge cases discussed above correspond to the determinant being zero, thus the inverse of the matrix does not exist, but in most cases this is the way to go. To be honest, this is the most important concept in this whole article, and if you can understand the Gaussian elimination or the inverse method, you understood DFT as well, as from now, only the details of this matrix and the inverse calculation methods will change.</p>
+		
+		<p><b>But hey!</b> - you might ask - <b>how do I find the frequencies as well? It is sure nice to be able to calculate the amplitudes, <i>if I already know what frequencies my signal has</i>, but that's not the case!</b> Yes, but before we make a choice on the frequencies to test for, there is another, even more serious problem.</p>
 		
 	</article>
 	<script src="script.js"></script>

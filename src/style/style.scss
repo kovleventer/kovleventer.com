@@ -8,6 +8,15 @@ $default-font-size: 20px;
 
 $header-height: 57px;
 
+$infobox-warning: #bdbd26;
+$infobox-warning-light: #ffff96;
+$infobox-info: #3b7ea8;
+$infobox-info-light: #8ad2ff;
+$infobox-error: #b34c1d;
+$infobox-error-light: #ffad87;
+$infobox-success: #118a34;
+$infobox-success-light: #78ffa0;
+
 body {
 	margin: 0;
     font-family: Helvetica, sans-serif;
@@ -143,6 +152,16 @@ body {
 				display: block;
 				margin: auto;
 			}
+			
+			video {
+				max-width: 90%;
+				max-height: 500px;
+				width: auto;
+				height: auto;
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+			}
 		}
 		
 		input[type=range] {
@@ -199,6 +218,49 @@ body {
 			li {
 				margin-bottom: 10px;
 			}
+		}
+		
+		.infobox {
+			border-radius: 10px;
+			border: 1px solid;
+			font-weight: bold;
+			padding-left: 20px+40px;
+			padding-right: 20px;
+			padding-top: 10px;
+			padding-bottom: 10px;
+			display: table;
+			background-repeat: no-repeat;
+			background-position: 10px center;
+			background-size: 40px 40px;
+			margin-bottom: 20px;
+		}
+		
+		.warning {
+			background-color: $infobox-warning-light;
+			border-color: $infobox-warning;
+			color: $infobox-warning;
+			background-image: url('res/infobox_warning.svg');
+		}
+		
+		.info {
+			background-color: $infobox-info-light;
+			border-color: $infobox-info;
+			color: $infobox-info;
+			background-image: url('res/infobox_info.svg');
+		}
+		
+		.error {
+			background-color: $infobox-error-light;
+			border-color: $infobox-error;
+			color: $infobox-error;
+			background-image: url('res/infobox_error.svg');
+		}
+		
+		.success {
+			background-color: $infobox-success-light;
+			border-color: $infobox-success;
+			color: $infobox-success;
+			background-image: url('res/infobox_success.svg');
 		}
 		
 		.code_highlight {

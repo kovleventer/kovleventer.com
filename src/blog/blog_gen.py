@@ -21,8 +21,8 @@ def syntax_file(filename):
     return highlight(content, guess_lexer(content), HtmlFormatter(cssclass="code_highlight"))
 
 matplotlib.rcParams['text.usetex'] = True
-matplotlib.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
-def render_tex(filename, fontsize=24):
+def render_tex(filename, fontsize=24, amsmath=True):
+    matplotlib.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}' if amsmath else '' # amsmath fucks up integral signs
     filename = os.path.join(folder, filename)
     content = open(filename).read()[:-1] # New line at the end
     fig = plt.figure(figsize=(0.01, 0.01))

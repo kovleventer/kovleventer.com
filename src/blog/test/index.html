@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		<figure>
+			<canvas id="dft_matrices"></canvas>
+			<input type="range" id="dft_size" min="1" max="10" value="1">
+			<input type="checkbox" id="dft_colored">
+			<label for="dft_colored">Colored</label>
+		</figure>
+		
+		<p>Additional information</p>
+		
+		{{ code("example.c") }}
+		
+		{{ formula("example_formula.tex", amsmath=False) }}
+		
+		<div class="infobox warning">
+			<p>This is a warning</p>
+		</div>
+		
+		<div class="infobox info">
+			<p>I'd just like to interject for a moment.  What you're referring to as Linux,
+is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux.
+Linux is not an operating system unto itself, but rather another free component
+of a fully functioning GNU system made useful by the GNU corelibs, shell
+utilities and vital system components comprising a full OS as defined by POSIX.</p>
+		</div>
+		
+		<div class="infobox error">
+			<p>Oh god no</p>
+		</div>
+		
+		<div class="infobox success">
+			<p>Why does this exist<p>
+		</div>
+		
+	</article>
+	<script src="script.js"></script>
+</body>
+</html>

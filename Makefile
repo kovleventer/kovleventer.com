@@ -29,6 +29,7 @@ html:
 	$(PYTHON_3) $(TEMPLATE_COMPILER)
 	cp src/utilities.js build/utilities.js
 	cp src/favicon.ico build/favicon.ico
+	cp -r src/res build/
 
 BLOG_TEMPLATE_COMPILER := src/blog/blog_gen.py
 build/blog/%index.html: src/blog/%index.html src/blog/% $(BLOG_TEMPLATE_COMPILER)

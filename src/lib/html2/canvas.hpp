@@ -37,17 +37,23 @@ public:
 		canvasCtx->strokeRect(x, y, width, height);
 	}
 	
-	void drawText(const char* str, int x, int y, int rgb) {
+	void drawText(const char* str, int x, int y, int rgb, const char* textAlign="center", const char* textBaseline="middle", int fontSize=20) {
 		int r = (rgb>>16)&0xff;
 		int g = (rgb>>8)&0xff;
 		int b = rgb&0xff;
-		canvasCtx->set_font("20px sans-serif");
+		canvasCtx->set_font((std::to_string(fontSize)+"px sans-serif").c_str());
+		canvasCtx->set_textAlign(textAlign);
+		canvasCtx->set_textBaseline(textBaseline);
 		canvasCtx->set_fillStyle(client::String("").concat("rgb(", r, ",", g, ",", b, ")"));
 		canvasCtx->fillText(str, x, y);
 	}
 	
 	void clear() {
 		canvasCtx->clearRect(0, 0, width, height);
+	}
+	
+	void addEventListener(const char* event, client::EventListener* cb) {
+		canvas->addEventListener(event, cb);
 	}
 	
 	// Unsafe hack so delete this latert TODO
