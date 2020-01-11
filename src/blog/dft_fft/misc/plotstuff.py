@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+#TODO clean this up
+
 def first():
     x = np.linspace(-2,4,2000)
     #y = np.sin(x)*3
@@ -52,5 +54,32 @@ def second():
     plt.savefig("out.png", dpi=300, transparent=True)
     #plt.show()
 
-second()
+def y_(x):
+    y1 = 3.1 * np.sin(2 * math.pi * .1 * x)
+    y2 = 0.8 * np.sin(2 * math.pi * .3 * x)
+    y3 = 1.4 * np.sin(2 * math.pi * .8 * x)
+    y = y1 + y2 + y3
+    return y
+
+def third():
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(-3, 6, 2000)
+    y = y_(x)
+    X = np.array([1, 2, 3])
+    Y = y_(X)
+
+    ax.plot(x, y, "r")
+    ax.stem(X, Y, basefmt=' ')
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+
+third()
 

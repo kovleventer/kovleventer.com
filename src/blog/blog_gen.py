@@ -5,7 +5,7 @@ import yaml
 
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
-from pygments.lexers import guess_lexer
+from pygments.lexers import guess_lexer, get_lexer_by_name
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -15,10 +15,14 @@ from io import BytesIO
 folder = sys.argv[1]
 
 
-def syntax_file(filename):
+def syntax_file(filename, lang_name=""):
     filename = os.path.join(folder, filename)
     content = open(filename).read()
-    return highlight(content, guess_lexer(content), HtmlFormatter(cssclass="code_highlight"))
+    if not lang_name:
+        lexer = guess_lexer(content)
+    else:
+        lexer = get_lexer_by_name(lang_name)
+    return highlight(content, lexer, HtmlFormatter(cssclass="code_highlight"))
 
 matplotlib.rcParams['text.usetex'] = True
 def render_tex(filename, fontsize=24, amsmath=True):

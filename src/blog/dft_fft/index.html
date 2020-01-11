@@ -19,7 +19,7 @@
 		
 		<p><b>Signal</b>s are usually divided into four categories by two main characteristics. They can be discrete or continous in time (the domain) and similarly have discrete or continous values (the codomain). For now, making a distinction in the codomain serves no purpose, so we are left with two groups.</p>
 		
-		<p>In practice you have discrete signals, for example measurements with a timestamp and a numeric value. The <span class="plt_blue">blue dots</span> mark such a signal with five measurement points. These points can be easily represented programatically by an array with pairs of numbers as items.</p>
+		<p>In practice you have discrete signals, for example measurements from a sensor with a timestamp and a numeric value. The <span class="plt_blue">blue dots</span> mark such a signal with five measurement points. These points can be easily represented programatically by an array with pairs of numbers as items.</p>
 		
 		<img id="signal" src="media/signal_lowfreq.png">
 		
@@ -33,7 +33,7 @@
 		
 		<ul>
 			<li>The time scale is completely arbitrary. There is no real meaning behind t=0, so we can shift the whole signal left by 0.4. When we are dealing with only one signal, there is no reason not fix its start point at zero time as leaving the offset at 0.4 would only make our calculations more complicated.</li>
-			<li>Samples are taken periodically at a fixed rate. That might <a href="https://en.wikipedia.org/wiki/Non-uniform_discrete_Fourier_transform">not always</a> be the case, but usually enough it is to use this simplification. As said above, the time scale is arbitary, so we can rescale the whole signal to have its samples taken at positive (and zero) integer time values. Of course you are probably dealing with physical quantities, so the time scale <i>is</i> important and should not be completely discarded, but more on that later.</li>
+			<li>Samples are taken periodically at a fixed rate. That might <a href="https://en.wikipedia.org/wiki/Non-uniform_discrete_Fourier_transform">not always</a> be the case, but usually enough it is to use this simplification. As said above, the time scale is arbitrary, so we can rescale the whole signal to have its samples taken at positive (and zero) integer time values. Of course you are probably dealing with physical quantities, so the time scale <i>is</i> important and should not be completely discarded, but more on that later.</li>
 		</ul>
 		
 		<p>So, our signal looks like this now:</p>
@@ -44,11 +44,13 @@
 		
 		<p><span class="mono">[1.17, 2.74, 2.84, 1.42, -0.77]</span></p>
 		
-		<p>And lastly, <b>Why do I use sines and cosines?</b> Firstly they are periodic functions. You might say a <a href="https://en.wikipedia.org/wiki/Square_wave">square wave</a> is periodic as well and way easier to make calculations with. But these signals are often pushed through integration and derivation steps, and it is rare to find such function that can survive these methods without minor alterations. Sine derives into cosine, and vica versa with a factor of -1, thus making repeated derivation return the original function after four steps. <a href="https://en.wikipedia.org/wiki/Exponential_function">Exponential</a> and <a href="https://en.wikipedia.org/wiki/Hyperbolic_function">hyperbolic</a> functions also have this property (and are closely related), but they are not periodic in the real domain. A flat constant zero function satisfies both properties, but is completely uninteresting.</p>
+		<p>And lastly, <b>Why do I use sines and cosines?</b> First, they are periodic functions. You might say a <a href="https://en.wikipedia.org/wiki/Square_wave">square wave</a> is periodic as well and way easier to make calculations with. But these signals are often pushed through integration and derivation steps, and it is rare to find such function that can survive these methods without minor alterations. Sine derives into cosine, and vica versa with a factor of -1, thus making repeated derivation return the original function after four steps. <a href="https://en.wikipedia.org/wiki/Exponential_function">Exponential</a> and <a href="https://en.wikipedia.org/wiki/Hyperbolic_function">hyperbolic</a> functions also have this property (and are closely related), but they are not periodic in the real domain. A flat constant zero function satisfies both properties, but is completely uninteresting.</p>
 		
 		<h2 id="skip">Synthesis and analysis</h2>
 		
-		<p>Our building blocks are cosine signals, which have a <a href="https://en.wikipedia.org/wiki/Frequency">frequency</a> (f) and an amplitude (A) as paramteres (and a phase which we conviniently ignore for now).</p>
+		<p class="disclaimer">The thought line of the following section (and some code examples) was largely based on <a href="https://github.com/AllenDowney/ThinkDSP">ThinkDSP</a> (chapter 6 and 7), but with some alterations, whenever I felt more clarification is needed.</p>
+		
+		<p>Our building blocks are cosine signals, which have a <a href="https://en.wikipedia.org/wiki/Frequency">frequency</a> (f) and an amplitude (A) as parameters (and a phase which we conviniently ignore for now).</p>
 		
 		{{ formula("simple_cosine.tex", 32) }}
 		
@@ -58,7 +60,7 @@
 		
 		{{ formula("sum_cosine.tex", 20) }}
 		
-		<p>As the example shows, even the sum of three cosines can result in complex-looking functions:</p>
+		<p id="complexcosine">As the example shows, even the sum of three cosines can result in complex-looking functions:</p>
 		
 		<img src="media/sum_cosine_concrete.svg"> <!-- TODO solve multi colored TeX rendering -->
 		
@@ -84,13 +86,37 @@
 		
 		<figure>
 			<video autoplay loop>
-			<source src="media/analysis_zeros.mp4" type="video/mp4">
+				<source src="media/analysis_zeros.mp4" type="video/mp4">
 			</video>
 		</figure>
 		
-		<p>Instead of solving a linear system of equatations each time, we can get the same result by taking the <b>inverse</b> of this cosine matrix. The edge cases discussed above correspond to the determinant being zero, thus the inverse of the matrix does not exist, but in most cases this is the way to go. To be honest, this is the most important concept in this whole article, and if you can understand the Gaussian elimination or the inverse method, you understood DFT as well, as from now, only the details of this matrix and the inverse calculation methods will change.</p>
+		<p>Instead of solving a linear system of equatations each time, we can get the same result by taking the <b>inverse</b> of this cosine matrix. The edge cases discussed above correspond to the determinant being zero, thus the inverse of the matrix not existing, but otherwise this is the way to go. To be honest, this is the most important concept in this whole article, and if you can understand the Gaussian elimination or the inverse method, you understood DFT as well, as from now, only the details of this matrix and the inverse calculation methods will change.</p>
+		
+		<p>You can verify this with a few lines of code. A python example below using the values <a href="#complexcosine">seen before</a>:</p>
+		
+		{{ code("analysis_example.py") }}
 		
 		<p><b>But hey!</b> - you might ask - <b>how do I find the frequencies as well? It is sure nice to be able to calculate the amplitudes, <i>if I already know what frequencies my signal has</i>, but that's not the case!</b> Yes, but before we make a choice on the frequencies to test for, there is another, even more serious problem.</p>
+		
+		<p>In the beginning of this section I made the not explained decision of solely using cosines as our building blocks instead of sines or both. What happens if we try to approximate a sum of sines by cosines? Let's modify our last example slightly:</p>
+		
+		{{ formula("sum_sine_concrete.tex", 20) }}
+		
+		<p>There is no reason to sample the <span class="plt_red">resulting signal</span> at zero time, as it will always be zero there. Don't worry, in that case we'll just take our <span class="plt_blue">samples</span> at t = {1, 2, 3}.</p>
+		
+		<img src="media/analysis_sine.png">
+		
+		<p>This results in S = <span class="mono">[1.25, 1.66, 3.30]</span>
+		
+		{{ code("analysis_sine_pt1.py", "python") }}
+		
+		<p>And now doing the analysis with cosines</p>
+		
+		{{ code("analysis_sine_pt2.py", "python") }}
+		
+		<p>What we get back from this is A_calc = <span class="mono">[3.64, 2.41, -3.06]</span>. Not even close.</p>
+		
+		<h2>Exponentials</h2>
 		
 	</article>
 	<script src="script.js"></script>

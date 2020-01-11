@@ -140,6 +140,18 @@ body {
 			font-size: ($default-font-size + 4);
 		}
 		
+		.disclaimer {
+			color: $mid-color;
+			font-weight: bold;
+			font-style: italic;
+			font-size: ($default-font-size - 4);
+			text-align: center;
+			width: 80%;
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		
 		figure {
 			border-style: solid;
 			border-color: $active-dark;
@@ -289,7 +301,10 @@ body {
 				.m { color: #a69e02 } /* Literal.Number */
 				.cp { color: #008207 } /* Comment.Preproc */
 				.cpf { color: #d18f00 } /* Comment.PreprocFile */
+				.kn { color: #008207; font-weight: bold  } /* Keyword.Namespace */
 				.kt { color: #0067ab } /* Keyword.Type */
+				.nn { color: #d18f00; font-weight: bold  } /* Name.Namespace */
+				.kp { color: #000080 } /* Keyword.Pseudo */
 				
 				// Not yet used
 				
@@ -315,8 +330,8 @@ body {
 				.gt { color: #0044DD } /* Generic.Traceback */
 				.kc { color: #008000; font-weight: bold } /* Keyword.Constant */
 				.kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
-				.kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
-				.kp { color: #008000 } /* Keyword.Pseudo */
+				
+				
 				.kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
 				
 				
@@ -330,7 +345,7 @@ body {
 				.ne { color: #D2413A; font-weight: bold } /* Name.Exception */
 				//.nf { color: #0000FF } /* Name.Function */
 				.nl { color: #A0A000 } /* Name.Label */
-				.nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+				
 				.nt { color: #008000; font-weight: bold } /* Name.Tag */
 				.nv { color: #19177C } /* Name.Variable */
 				.ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
