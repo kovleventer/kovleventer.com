@@ -25,8 +25,8 @@ def syntax_file(filename, lang_name=""):
     return highlight(content, lexer, HtmlFormatter(cssclass="code_highlight"))
 
 matplotlib.rcParams['text.usetex'] = True
-def render_tex(filename, fontsize=24, amsmath=True):
-    matplotlib.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}' if amsmath else '' # amsmath fucks up integral signs
+def render_tex(filename, fontsize=24, amsmath=True, inline=False):
+    matplotlib.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}' if amsmath else '' # amsmath fucks up integral signs (and fracs as well)
     filename = os.path.join(folder, filename)
     content = open(filename).read()[:-1] # New line at the end
     fig = plt.figure(figsize=(0.01, 0.01))
@@ -44,7 +44,7 @@ def render_tex(filename, fontsize=24, amsmath=True):
     plt.close(fig)
 
     svg = svg.split("/")[-1]
-    return '<img class="formula" src="' + svg + '">'
+    return '<img class="formula' + ('_inline"' if inline else '"') + ' src="' + svg + '">'
 
 
 config = os.path.join(folder, "config.yaml")

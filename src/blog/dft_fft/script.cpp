@@ -1,15 +1,16 @@
 #include <cheerp/clientlib.h>
 #include <cheerp/client.h>
 
-#include "html2/scene.hpp"
-#include "html2/graphics.hpp"
-#include "html2/rect.hpp"
+#include "html/scene.hpp"
+#include "html/graphics.hpp"
+#include "html/rect.hpp"
 #include "math/matrix.hpp"
 #include "color.hpp"
 
 #include <vector>
 #include <iostream>
 #include <locale>
+#include <cmath>
 
 extern "C" [[cheerp::genericjs]] [[cheerp::jsexport]]
 void hi_freq() {
@@ -87,6 +88,59 @@ void constructSynthMatrices() {
 	}
 }
 
+CanvasPTR expSinCosCanvas;
+double t = 0;
+
+void updateExp() {
+	Graphics::clear(expSinCosCanvas);
+	t -= 0.02;
+	int r = 100;
+	int w = 500;
+	int h = 500;
+	int rr = 10;
+	Graphics::setLineWidth(expSinCosCanvas, 4);
+	
+	Graphics::fillCircle(expSinCosCanvas, r+rr, h-r-rr, 30, 0, std::fmod(t, 2 * M_PI), Color::MAT_YELLOW_300);
+	Graphics::drawCircle(expSinCosCanvas, r+rr, h-r-rr, 30, 0, std::fmod(t, 2 * M_PI), Color::MAT_YELLOW_700);
+	
+	Graphics::setLineWidth(expSinCosCanvas, 2);
+	
+	Graphics::drawCircle(expSinCosCanvas, r+rr, h-r-rr, r, 0, 2 * M_PI, Color::GRAY);
+	Graphics::drawLine(expSinCosCanvas, r+rr, 0, r+rr, h, Color::GRAY);
+	Graphics::drawLine(expSinCosCanvas, 0, h-r-rr, w, h-r-rr, Color::GRAY);
+	
+	
+	
+	for (int i = 0; i < 400; i++) {
+		double t_1 = t + i * 0.09;
+		double t_2 = t + (i+1) * 0.09;
+		
+		Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t_1)*r, h-r-rr-r-(t_1 - t)*10, r+rr + std::cos(t_2)*r, h-r-rr-r-(t_2 - t)*10, Color::MAT_CYAN_700);
+		Graphics::drawLine(expSinCosCanvas, rr+r+r+(t_1 - t)*10, h-r-rr + std::sin(t_1)*r, rr+r+r+(t_2 - t)*10, h-r-rr + std::sin(t_2)*r, Color::MAT_GREEN_700);
+	}
+	
+	
+	
+	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, r+rr + std::cos(t)*r, h-r-rr-r, Color::MAT_CYAN_300);
+	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, rr+r+r, h-r-rr + std::sin(t)*r, Color::MAT_GREEN_300);
+	
+	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, r + rr, h-r-rr, Color::GRAY);
+	
+	
+	
+	
+	
+	Graphics::fillCircle(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, rr, 0, 2 * M_PI, Color::MAT_RED_700);
+	
+	
+}
+
+
+[[cheerp::genericjs]]
+void updateExpJS(void) {
+	updateExp();
+}
+
 [[cheerp::genericjs]]
 void initSynth() {
 	synthesisMTX = Scene();
@@ -100,6 +154,14 @@ void initSynth() {
 	synthesisMTX.render(synthesisMTXCanvas);
 }
 
-[[cheerp::genericjs]] void webMain() {
+[[cheerp::genericjs]]
+void initExp() {
+	expSinCosCanvas = Graphics::createCanvas("expo_sin_cos", 500, 500);
+	Graphics::setRenderCallback(synthesisMTXCanvas, updateExpJS);
+}
+
+[[cheerp::genericjs]]
+void webMain() {
 	initSynth();
+	initExp();
 }

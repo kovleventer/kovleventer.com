@@ -25,15 +25,15 @@
 		
 		<p><span class="mono">[(0.4, 1.17), (1.15, 2.74), (1.9, 2.84), (2.65, 1.42), (3.4, -0.77)]</span></p>
 		
-		<p>The <span class="plt_red">red line</span> represents a more abstract signal (3*sin(x) in this case). It is defined for every x, but dealing with concrete values gets harder as the functions composing the signal get more complex. At first glance it may seem that the blue signal samples the red one, as it fits perfectly in those points, but <a onclick="hi_freq()">why would that be the case</a>? (<a onclick="lo_freq()">revert</a>)</p>
+		<p>The <span class="plt_red">red line</span> represents a more abstract signal (3*sin(x) in this case). It is defined for every x, but dealing with concrete values gets harder as the functions composing the signal get more complex. At first glance it may seem that the blue signal samples the red one, as it fits perfectly in those points, but <a class="hoverbutton" onmouseover="hi_freq()" onmouseout="lo_freq()">why would that be the case</a>?</p>
 		
-		<p>It seems abstract functions would serve a purpose in inter- and extrapolating values, if they would be unequivocally deducable. Without diving into the realm of interpolation we can say that there won't be a bijection between discrete and continous signals, but also that the <a onclick="lo_freq()">first signal</a> <i>clearly</i> fits our measurements more, where 'clearly' remains an ambigous term for now.</p>
+		<p>It seems abstract functions would serve a purpose in inter- and extrapolating values, if they would be unequivocally expressible. Without diving into the realm of interpolation we can say that there won't be a bijection between discrete and continous signals, but also that the first signal <i>clearly</i> fits our measurements more, where 'clearly' remains an ambigous term for now.</p>
 		
-		<p>There are also two things worth mentioning about the <span class="plt_blue">blue signal:</span></p>
+		<p>There are also two things worth mentioning about the <span class="plt_blue">blue signal</span>:</p>
 		
 		<ul>
 			<li>The time scale is completely arbitrary. There is no real meaning behind t=0, so we can shift the whole signal left by 0.4. When we are dealing with only one signal, there is no reason not fix its start point at zero time as leaving the offset at 0.4 would only make our calculations more complicated.</li>
-			<li>Samples are taken periodically at a fixed rate. That might <a href="https://en.wikipedia.org/wiki/Non-uniform_discrete_Fourier_transform">not always</a> be the case, but usually enough it is to use this simplification. As said above, the time scale is arbitrary, so we can rescale the whole signal to have its samples taken at positive (and zero) integer time values. Of course you are probably dealing with physical quantities, so the time scale <i>is</i> important and should not be completely discarded, but more on that later.</li>
+			<li>Samples are taken periodically at a fixed rate. That might <a href="https://en.wikipedia.org/wiki/Non-uniform_discrete_Fourier_transform">not always</a> be the case, but still is most of the time so using this simplification should be fine for now. As said above, the time scale is arbitrary, so we can rescale the whole signal to have its samples taken at positive (and zero) integer time values. Of course you are probably dealing with physical quantities, so the time scale <i>is</i> important and should not be completely discarded, but more on that later.</li>
 		</ul>
 		
 		<p>So, our signal looks like this now:</p>
@@ -117,6 +117,48 @@
 		<p>What we get back from this is A_calc = <span class="mono">[3.64, 2.41, -3.06]</span>. Not even close.</p>
 		
 		<h2>Exponentials</h2>
+		
+		<p>The first naïve idea would be: <i>Well, why don't we use both?</i> Naïve ideas are not necessarily bad ideas, so let's see how this turns out. Our building blocks are now sums of sine and cosine functions.</p>
+		
+		{{ formula("expo_sin_cos_1.tex", 24) }}
+		
+		<p>We can normalize A and B, by dividing them with the square root of the sum of the two terms squared</p>
+		
+		{{ formula("expo_sin_cos_2.tex", 24, amsmath=False) }}
+		
+		<p>Let's use <i>C</i> as a shorthand for {{ formula("expo_sin_cos_3.tex", 18, inline=True, amsmath=False) }}, and since the sum of <i>A/C</i> and <i>B/C</i> squared is 1 now, we can find a φ (greek phi) such as</p>
+		
+		{{ formula("expo_sin_cos_4.tex", 24, amsmath=False) }}
+		
+		{{ formula("expo_sin_cos_5.tex", 24, amsmath=False) }}
+		
+		<p>Dividing the second equatation with the first, the <i>C</i>s cancel out and we are left with a nicer formula</p>
+		
+		{{ formula("expo_sin_cos_6.tex", 24, amsmath=False) }}
+		
+		<p>And now we can get the value of φ by plugging <i>B/A</i> into the <a href="https://en.wikipedia.org/wiki/Inverse_trigonometric_functions">inverse</a> of tangent (also don't forget to check if <i>A</i> is zero). Our signal looks like this now:<p>
+		
+		{{ formula("expo_sin_cos_7.tex", 24) }}
+		
+		<p>Multiplied by <i>C</i> what we have right now is an <a href="https://en.wikipedia.org/wiki/List_of_trigonometric_identities#Angle_sum_and_difference_identities">identity</a>, namely the cosine of the difference of two angles.</p>
+		
+		{{ formula("expo_sin_cos_8.tex", 24) }}
+		
+		<p>We could do some rearrangement since cosine is an even function. Also we have shown (not rigorously) that with just a sine and a cosine, we are able to express any sinusoid shifted with a phase φ. There are also more intuitive ways to reach this conclusion. Cosine is an <b>even</b> function, and even functions can be used to analyse even signals, and the same can be said for sine, except it is <b>odd</b> and is useful for odd signals. And since you <a href="https://math.stackexchange.com/questions/5274/how-do-i-divide-a-function-into-even-and-odd-sections">can divide any signal into even and odd sections</a>, you can analyse both parts by using only sines or cosines.</p>
+		
+		<p>For me, the geometrical view was the most intuitive. We can treat <span class="mat_cyan_700">sine</span> and <span class="mat_green_700">cosine</span> as <i>projections</i> of a simple, two-dimensional circular rotation.</p>
+		
+		<figure>
+			<canvas id="expo_sin_cos"></canvas>
+		</figure>
+		
+		<p>We can represent this system, the red dot with a single parameter, namely the <span class="mat_yellow_900">angle</span>. We can define a function <b>rot</b>, that accepts a number, and spits out cosine, and sine as a pair.</p>
+		
+		{{ formula("exp_rot.tex", 24) }}
+		
+		<p>If you are familiar with <b>complex numbers</b>, the exponential form does the same and probably makes more sense to you than my arbitrarily defined function. Otherwise you are probably wondering where the hell did <i>e</i> and <i>j</i> came from, but don't worry about them; substitute <i>rot()</i> in your head.</p>
+		
+		{{ formula("exp_form.tex", 24) }}
 		
 	</article>
 	<script src="script.js"></script>

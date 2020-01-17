@@ -1,30 +1,27 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include "renderable.hpp"
-#include "htmlcanvas.hpp"
+#include "graphics.hpp"
 
 class Scene {
 private:
 	std::vector<Renderable*> elements;
 public:
-	Scene();
+	Scene() {}
 	
 	void addElement(Renderable* element) {
 		elements.push_back(element);
 	}
 	
-	std::vector<Renderable*> __getElements() {
-		return elements;
+	void render(CanvasPTR id) {
+		Graphics::clear(id);
+		for (Renderable* element : elements) {
+			element->render(id);
+		}
 	}
+	
+	
 };
-
-[[cheerp::genericjs]] void Scene_render(Scene& s, Canvas* canvas) {
-	auto elements = s.__getElements();
-	for (Renderable* element : elements) {
-		element->render();
-	}
-}
-
-

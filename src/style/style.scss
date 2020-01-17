@@ -127,6 +127,22 @@ body {
 			&:hover {
 				text-decoration: underline;
 			}
+			&.hoverbutton {
+				border-radius: 10px;
+				border: 2px solid;
+				border-color: $active-color;
+				padding: 1px 5px;
+				margin: 1px 5px;
+				display: inline-block;
+				height: 150%;
+				background-color: $white;
+				
+				&:hover {
+					text-decoration: none;
+					background-color: $active-color;
+					color: $white;
+				}
+			}
 		}
 
 		.date {
@@ -217,10 +233,15 @@ body {
 			display: block;
 			margin-left: auto;
 			margin-right: auto;
+			
+			&.formula_inline {
+				display: inline-block;
+				vertical-align: middle;
+			}
 		}
 		
 		.mono {
-			font-family: Hack, Monaco, monospace;
+			font-family: Hack, Monaco, "Fira Code", monospace;
 			background-color: $slightly-darker-than-light;
 			padding: 10px;
 			font-size: ($default-font-size - 2);
@@ -277,7 +298,7 @@ body {
 		
 		.code_highlight {
 			pre {
-				font-family: Hack, Monaco, monospace; // TODO do this properly
+				font-family: Hack, Monaco, "Fira Code", monospace; // TODO do this properly
 				font-size: ($default-font-size - 2);
 				border: 1px solid $active-dark;
 				background-color: $white;
@@ -376,6 +397,10 @@ body {
 		
 		.plt_red { color: #FF0000; }
 		.plt_blue { color: #1f77b4; }
+		
+		.mat_cyan_700 { color: #0097a7; }
+		.mat_green_700 { color: #388e3c; }
+		.mat_yellow_900 { color: #f57f17; }
 	}
 	
 	

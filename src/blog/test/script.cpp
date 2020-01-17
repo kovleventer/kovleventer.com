@@ -1,8 +1,8 @@
 #include <cheerp/clientlib.h>
 #include <cheerp/client.h>
 
-#include "html2/canvas.hpp"
-#include "html2/input.hpp"
+#include "html/canvas.hpp"
+#include "html/input.hpp"
 #include "math/matrix.hpp"
 #include "math/complex.hpp"
 #include "color.hpp"
