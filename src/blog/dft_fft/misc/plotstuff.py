@@ -80,6 +80,31 @@ def third():
     ax.stem(X, Y, basefmt=' ')
     plt.savefig("out.png", dpi=300, transparent=True)
 
+def y4(x):
+    y1 = 3.1 * np.cos(2 * math.pi * .1 * x - 1.2)
+    y2 = 0.8 * np.cos(2 * math.pi * .3 * x - 1.3)
+    y3 = 1.4 * np.cos(2 * math.pi * .8 * x - 1.5)
+    y = y1 + y2 + y3
+    return y
 
-third()
+def fourth():
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(-2, 6, 2000)
+    y = y4(x)
+    X = np.array([0, 1, 2, 3, 4, 5])
+    Y = y4(X)
+
+    ax.plot(x, y, "r")
+    ax.stem(X, Y, basefmt=' ')
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+fourth()
 

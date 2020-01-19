@@ -152,13 +152,39 @@
 			<canvas id="expo_sin_cos"></canvas>
 		</figure>
 		
-		<p>We can represent this system, the red dot with a single parameter, namely the <span class="mat_yellow_900">angle</span>. We can define a function <b>rot</b>, that accepts a number, and spits out cosine, and sine as a pair.</p>
+		<p>We can represent this system, the red dot with a single parameter, namely the <span class="mat_yellow_900">angle</span>, and than define a function <b>rot</b>, that accepts a number, and spits out its cosine and sine as a pair.</p>
 		
 		{{ formula("exp_rot.tex", 24) }}
 		
-		<p>If you are familiar with <b>complex numbers</b>, the exponential form does the same and probably makes more sense to you than my arbitrarily defined function. Otherwise you are probably wondering where the hell did <i>e</i> and <i>j</i> came from, but don't worry about them; substitute <i>rot()</i> in your head.</p>
+		<p>If you are familiar with <b>complex numbers</b>, the exponential form does the same and probably makes more sense to you than my arbitrarily defined function. Otherwise you are probably wondering where the hell did <i>e</i> and <i>j</i> come from, but don't worry about them; substitute <i>rot()</i> in your head. Furthermore, you might have seen this formula but with <i>i</i> instead of <i>j</i>, it is just a matter of notation which symbol to use.</p>
 		
 		{{ formula("exp_form.tex", 24) }}
+		
+		
+		<p>Using complex numbers has a few advantages:</p>
+		
+		<ul>
+			<li>Multiplying a complex number with a real number scales the complex number, but keeps the angle.</li>
+			<img src="media/expo_scale.png">
+			<li>Multiplying two rotations (complex number with length one) yields a third one with its angle being the sum of of the two original angles due to the exponential identities.</li>
+			<img src="media/expo_angle.png">
+		</ul>
+		
+		<p>Usually when multiplying two complex numbers, scaling and rotation both take place.</p>
+		
+		<p>But how all of this helps us in practice? Well, take a step back. We have shown that from a sine and cosine pair we can handle all kinds of phases. The reverse is also true: for any phase, a sine and cosine pair is sufficient. This increases the width of our matrix M by twice, and to keep our system of equatations solvable, we'll need to take twice as many samples now. Remember, for each frequency component, we have now two unknowns to solve: the sine and cosine, or in other terms, the amplitude and the angle.</p>
+		
+		<figure>
+			<canvas id="synthesis_sin_cos"></canvas>
+		</figure>
+		
+		<p>Add a few phases to our last example:</p>
+		
+		<img src="media/expo_sin_cos_example.svg"> <!-- TODO coloring -->
+		
+		<p>With six sample points from 0 to 5 our signal looks like this:<p>
+		
+		<img src="media/expo_sin_cos_example_plot.png">
 		
 	</article>
 	<script src="script.js"></script>

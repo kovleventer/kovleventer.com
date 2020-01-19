@@ -28,7 +28,7 @@ Scene synthesisMTX;
 CanvasPTR synthesisMTXCanvas;
 std::vector<Rect*> synthMTXelements;
 
-void mouseMove(int X, int Y) {
+void mouseMoveSynth(int X, int Y) {
 	bool wasSelected = false;
 	for (int y = 0; y < 3; y++) {
 		if (synthMTXelements[12+y]->contains(X, Y)) {
@@ -54,12 +54,12 @@ void mouseMove(int X, int Y) {
 
 [[cheerp::genericjs]]
 void mouseMoveJS(client::MouseEvent* e) {
-	mouseMove(e->get_offsetX(), e->get_offsetY());
+	mouseMoveSynth(e->get_offsetX(), e->get_offsetY());
 }
 
 [[cheerp::genericjs]]
 void mouseExitJS(client::MouseEvent* e) {
-	mouseMove(-100, -100);
+	mouseMoveSynth(-100, -100);
 }
 
 void constructSynthMatrices() {
@@ -94,6 +94,7 @@ double t = 0;
 void updateExp() {
 	Graphics::clear(expSinCosCanvas);
 	t -= 0.02;
+	double tt = t + 0.6;
 	int r = 100;
 	int w = 500;
 	int h = 500;
@@ -102,6 +103,7 @@ void updateExp() {
 	
 	Graphics::fillCircle(expSinCosCanvas, r+rr, h-r-rr, 30, 0, std::fmod(t, 2 * M_PI), Color::MAT_YELLOW_300);
 	Graphics::drawCircle(expSinCosCanvas, r+rr, h-r-rr, 30, 0, std::fmod(t, 2 * M_PI), Color::MAT_YELLOW_700);
+	
 	
 	Graphics::setLineWidth(expSinCosCanvas, 2);
 	
@@ -112,8 +114,8 @@ void updateExp() {
 	
 	
 	for (int i = 0; i < 400; i++) {
-		double t_1 = t + i * 0.09;
-		double t_2 = t + (i+1) * 0.09;
+		double t_1 = t + i * 0.11;
+		double t_2 = t + (i+1) * 0.11; // squiggly but idk why
 		
 		Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t_1)*r, h-r-rr-r-(t_1 - t)*10, r+rr + std::cos(t_2)*r, h-r-rr-r-(t_2 - t)*10, Color::MAT_CYAN_700);
 		Graphics::drawLine(expSinCosCanvas, rr+r+r+(t_1 - t)*10, h-r-rr + std::sin(t_1)*r, rr+r+r+(t_2 - t)*10, h-r-rr + std::sin(t_2)*r, Color::MAT_GREEN_700);
@@ -123,15 +125,8 @@ void updateExp() {
 	
 	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, r+rr + std::cos(t)*r, h-r-rr-r, Color::MAT_CYAN_300);
 	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, rr+r+r, h-r-rr + std::sin(t)*r, Color::MAT_GREEN_300);
-	
 	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, r + rr, h-r-rr, Color::GRAY);
-	
-	
-	
-	
-	
 	Graphics::fillCircle(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, rr, 0, 2 * M_PI, Color::MAT_RED_700);
-	
 	
 }
 
@@ -139,6 +134,86 @@ void updateExp() {
 [[cheerp::genericjs]]
 void updateExpJS(void) {
 	updateExp();
+}
+
+Scene synthesisSCMTX;
+CanvasPTR synthesisSCMTXCanvas;
+std::vector<Rect*> synthSCMTXelements;
+
+void constructSynthSCMatrices() {
+	int padding = 30;
+	int s = 50;
+	int sw = 120;
+	for (int y = 0; y < 6; y++) {
+		for (int x = 0; x < 3; x++) {
+			Rect* r = new Rect(sw * x, 6 * s + padding + y * s, sw, s, Color::MAT_RED_50, 15);
+			r->setText(std::string("cos(2*pi*f")+std::to_string(x+1)+std::string("*x")+std::to_string(y+1)+std::string(")")); // TODO use π instead of pi
+			synthesisSCMTX.addElement(r);
+			synthSCMTXelements.push_back(r);
+		}
+		for (int x = 0; x < 3; x++) {
+			Rect* r = new Rect(sw * (x+3), 6 * s + padding + y * s, sw, s, Color::MAT_PINK_50, 15);
+			r->setText(std::string("sin(2*pi*f")+std::to_string(x+1)+std::string("*x")+std::to_string(y+1)+std::string(")")); // TODO use π instead of pi
+			synthesisSCMTX.addElement(r);
+			synthSCMTXelements.push_back(r);
+		}
+	}
+	for (int y = 0; y < 3; y++) {
+		Rect* r = new Rect(6 * sw + padding, y * s, s, s, Color::MAT_CYAN_50, 15);
+		r->setText(std::string("A")+std::to_string(y+1));
+		synthSCMTXelements.push_back(r);
+		synthesisSCMTX.addElement(r);
+	}
+	for (int y = 0; y < 3; y++) {
+		Rect* r = new Rect(6 * sw + padding, (y+3) * s, s, s, Color::MAT_LBLUE_50, 15);
+		r->setText(std::string("B")+std::to_string(y+1));
+		synthSCMTXelements.push_back(r);
+		synthesisSCMTX.addElement(r);
+	}
+	for (int y = 0; y < 6; y++) {
+		Rect* r = new Rect(6 * sw + padding, 6 * s + padding + y * s, s, s, Color::MAT_GREEN_50, 15);
+		r->setText(std::string("s(x")+std::to_string(y+1)+std::string(")"));
+		synthSCMTXelements.push_back(r);
+		synthesisSCMTX.addElement(r);
+	}
+}
+
+void mouseMoveSynthSC(int X, int Y) {
+	std::cout << "asd" << std::endl;
+	bool wasSelected = false;
+	for (int y = 0; y < 6; y++) {
+		if (synthSCMTXelements[42+y]->contains(X, Y)) {
+			synthSCMTXelements[42+y]->setFillColor(Color::MAT_GREEN_300);
+			for (int x = 0; x < 3; x++) {
+				synthSCMTXelements[y*6+x]->setFillColor(Color::MAT_RED_300);
+				synthSCMTXelements[y*6+x+3]->setFillColor(Color::MAT_PINK_300);
+			}
+			wasSelected = true;
+			
+		} else {
+			synthSCMTXelements[42+y]->setFillColor(Color::MAT_GREEN_50);
+			for (int x = 0; x < 3; x++) {
+				synthSCMTXelements[y*6+x]->setFillColor(Color::MAT_RED_50);
+				synthSCMTXelements[y*6+x+3]->setFillColor(Color::MAT_PINK_50);
+			}
+		}
+	}
+	
+	for (int y = 0; y < 3; y++) {
+		synthSCMTXelements[36+y]->setFillColor(wasSelected ? Color::MAT_CYAN_300 : Color::MAT_CYAN_50);
+		synthSCMTXelements[36+y+3]->setFillColor(wasSelected ? Color::MAT_LBLUE_300 : Color::MAT_LBLUE_50);
+	}
+	synthesisSCMTX.render(synthesisSCMTXCanvas);
+}
+
+[[cheerp::genericjs]]
+void mouseMoveSCJS(client::MouseEvent* e) {
+	mouseMoveSynthSC(e->get_offsetX(), e->get_offsetY());
+}
+
+[[cheerp::genericjs]]
+void mouseExitSCJS(client::MouseEvent* e) {
+	mouseMoveSynthSC(-100, -100);
 }
 
 [[cheerp::genericjs]]
@@ -161,7 +236,21 @@ void initExp() {
 }
 
 [[cheerp::genericjs]]
+void initSynthSinCos() {
+	synthesisMTX = Scene();
+	int w=850, h=650;
+	synthesisSCMTXCanvas = Graphics::createCanvas("synthesis_sin_cos", w, h);
+	Graphics::addEventListener(synthesisSCMTXCanvas, "mousemove", cheerp::Callback(mouseMoveSCJS));
+	Graphics::addEventListener(synthesisSCMTXCanvas, "mouseout", cheerp::Callback(mouseExitSCJS));
+	
+	constructSynthSCMatrices();
+
+	synthesisSCMTX.render(synthesisSCMTXCanvas);
+}
+
+[[cheerp::genericjs]]
 void webMain() {
 	initSynth();
 	initExp();
+	initSynthSinCos();
 }
