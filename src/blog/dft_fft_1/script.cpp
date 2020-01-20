@@ -4,6 +4,7 @@
 #include "html/scene.hpp"
 #include "html/graphics.hpp"
 #include "html/rect.hpp"
+#include "html/input.hpp"
 #include "math/matrix.hpp"
 #include "color.hpp"
 
@@ -179,7 +180,6 @@ void constructSynthSCMatrices() {
 }
 
 void mouseMoveSynthSC(int X, int Y) {
-	std::cout << "asd" << std::endl;
 	bool wasSelected = false;
 	for (int y = 0; y < 6; y++) {
 		if (synthSCMTXelements[42+y]->contains(X, Y)) {
@@ -216,6 +216,101 @@ void mouseExitSCJS(client::MouseEvent* e) {
 	mouseMoveSynthSC(-100, -100);
 }
 
+CanvasPTR dftWRotCanvas;
+[[cheerp::genericjs]] client::HTMLInputElement *dftWRotRange;
+
+void renderDFTWRot(int value) {
+	Graphics::clear(dftWRotCanvas);
+	
+	int w = 400;
+	int h = 400;
+	int r = 100;
+	Graphics::setLineWidth(dftWRotCanvas, 8);
+	for (int i = 0; i < 5; i++) {
+		Graphics::drawLine(dftWRotCanvas, w/2, h/2, w/2+std::cos(2*M_PI*i/5)*(r), h/2-std::sin(2*M_PI*i/5)*(r), Color::MAT_RED_50);
+	}
+	Graphics::setLineWidth(dftWRotCanvas, 2);
+	Graphics::drawCircle(dftWRotCanvas, w/2, h/2, r, 0, 2*M_PI, Color::GRAY);
+	Graphics::drawLine(dftWRotCanvas, w/2, 0, w/2, h, Color::GRAY);
+	Graphics::drawLine(dftWRotCanvas, 0, h/2, w, h/2, Color::GRAY);
+	Graphics::setLineWidth(dftWRotCanvas, 8);
+	Graphics::drawLine(dftWRotCanvas, w/2, h/2, w/2+std::cos(2*M_PI*value/5)*(r+10), h/2-std::sin(2*M_PI*value/5)*(r+10), Color::MAT_RED_700);
+	Graphics::drawText(dftWRotCanvas, (std::string("f*t*N=") + std::to_string(value)).c_str(), w*3/4, 40, Color::GRAY, "center", "middle", 30);
+}
+
+[[cheerp::genericjs]]
+void renderDFTWRotJS() {
+	int value = getNumericInput(dftWRotRange);
+	renderDFTWRot(value);
+}
+
+Scene dftInverse;
+CanvasPTR dftInverseCanvas;
+std::vector<Rect*> dftInverseElements;
+
+void constructDFTIMatrices() {
+	int padding = 30;
+	int s = 50;
+	for (int y = 0; y < 5; y++) {
+		for (int x = 0; x < 5; x++) {
+			Rect* r = new Rect(s * x, 5 * s + padding + y * s, s, s, Color::MAT_RED_50, 15);
+			r->setText(std::string("W^")+std::to_string((x*y)%5));
+			dftInverse.addElement(r);
+			dftInverseElements.push_back(r);
+		}
+	}
+	for (int y = 0; y < 5; y++) {
+		for (int x = 0; x < 5; x++) {
+			Rect* r = new Rect(s * x + 5 * s + padding, y * s, s, s, Color::MAT_CYAN_50, 15);
+			r->setText(std::string("W^(-")+std::to_string((x*y)%5)+std::string(")"));
+			dftInverse.addElement(r);
+			dftInverseElements.push_back(r);
+		}
+	}
+	for (int y = 0; y < 5; y++) {
+		for (int x = 0; x < 5; x++) {
+			Rect* r = new Rect(s * x + 5 * s + padding, 5 * s + padding + y * s, s, s, Color::MAT_GREEN_50, 15);
+			r->setText(x==y ? std::string("5") : std::string("0"));
+			dftInverse.addElement(r);
+			dftInverseElements.push_back(r);
+		}
+	}
+}
+
+void mouseExitDFTI(int X, int Y) {
+	
+	for (int i = 0; i < 25; i++) {
+		dftInverseElements[i]->setFillColor(Color::MAT_RED_50);
+		dftInverseElements[25+i]->setFillColor(Color::MAT_CYAN_50);
+		dftInverseElements[50+i]->setFillColor(Color::MAT_GREEN_50);
+	}
+	
+	for (int y = 0; y < 5; y++) {
+		for (int x = 0; x < 5; x++) {
+			if (dftInverseElements[50+y*5+x]->contains(X, Y)) {
+				dftInverseElements[50+y*5+x]->setFillColor(Color::MAT_GREEN_300);
+				
+				for (int z = 0; z < 5; z++) {
+					dftInverseElements[y*5+z]->setFillColor(Color::MAT_RED_300);
+					dftInverseElements[25+z*5+x]->setFillColor(Color::MAT_CYAN_300);
+				}
+			}
+		}
+	}
+	
+	dftInverse.render(dftInverseCanvas);
+}
+
+[[cheerp::genericjs]]
+void mouseMoveDFTIJS(client::MouseEvent* e) {
+	mouseExitDFTI(e->get_offsetX(), e->get_offsetY());
+}
+
+[[cheerp::genericjs]]
+void mouseExitDFTIJS(client::MouseEvent* e) {
+	mouseExitDFTI(-100, -100);
+}
+
 [[cheerp::genericjs]]
 void initSynth() {
 	synthesisMTX = Scene();
@@ -232,12 +327,12 @@ void initSynth() {
 [[cheerp::genericjs]]
 void initExp() {
 	expSinCosCanvas = Graphics::createCanvas("expo_sin_cos", 500, 500);
-	Graphics::setRenderCallback(synthesisMTXCanvas, updateExpJS);
+	Graphics::setRenderCallback(expSinCosCanvas, updateExpJS);
 }
 
 [[cheerp::genericjs]]
 void initSynthSinCos() {
-	synthesisMTX = Scene();
+	synthesisSCMTX = Scene();
 	int w=850, h=650;
 	synthesisSCMTXCanvas = Graphics::createCanvas("synthesis_sin_cos", w, h);
 	Graphics::addEventListener(synthesisSCMTXCanvas, "mousemove", cheerp::Callback(mouseMoveSCJS));
@@ -249,8 +344,31 @@ void initSynthSinCos() {
 }
 
 [[cheerp::genericjs]]
+void initDFTWRot() {
+	dftWRotCanvas = Graphics::createCanvas("dft_wrot", 400, 400);
+	dftWRotRange = static_cast<client::HTMLInputElement*>(client::document.getElementById("dft_wrot_exp"));
+	dftWRotRange->addEventListener("input", cheerp::Callback(renderDFTWRotJS));
+	renderDFTWRotJS();
+}
+
+[[cheerp::genericjs]]
+void initDFTInverse() {
+	dftInverse = Scene();
+	int w=550, h=550;
+	dftInverseCanvas = Graphics::createCanvas("dft_inverse", w, h);
+	Graphics::addEventListener(dftInverseCanvas, "mousemove", cheerp::Callback(mouseMoveDFTIJS));
+	Graphics::addEventListener(dftInverseCanvas, "mouseout", cheerp::Callback(mouseExitDFTIJS));
+	
+	constructDFTIMatrices();
+
+	dftInverse.render(dftInverseCanvas);
+}
+
+[[cheerp::genericjs]]
 void webMain() {
 	initSynth();
 	initExp();
 	initSynthSinCos();
+	initDFTWRot();
+	initDFTInverse();
 }

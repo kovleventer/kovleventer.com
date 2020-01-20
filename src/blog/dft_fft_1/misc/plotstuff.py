@@ -106,5 +106,83 @@ def fourth():
     ax.stem(X, Y, basefmt=' ')
     plt.savefig("out.png", dpi=300, transparent=True)
 
-fourth()
+def fifth():
+    fig, ax = plt.subplots()
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(-1, 4, 2000)
+    y1 = np.cos(2 * math.pi * 0.1 * x)
+    y2 = np.cos(2 * math.pi * 1.1 * x)
+    y3 = np.cos(2 * math.pi * 2.1 * x)
+    X = np.arange(-1, 5)
+    Y = np.cos(2 * math.pi * 0.1 * X)
+    ax.plot(x, y1, "r")
+    ax.plot(x, y2, "g")
+    ax.plot(x, y3, "y")
+    ax.stem(X, Y, basefmt=' ')
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+def sixth():
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(-1, 4, 2000)
+    y1 = np.sin(2 * math.pi * 0.3 * x)
+    y2 = np.sin(2 * math.pi * 0.7 * x)
+    X = np.arange(-1, 5)
+    Y1 = np.sin(2 * math.pi * 0.3 * X)
+    Y2 = np.sin(2 * math.pi * 0.7 * X)
+    ax.plot(x, y1, "r")
+    ax.plot(x, y2, "g")
+    ax.stem(X, Y1, basefmt=' ')
+    ax.stem(X, Y2,  "y", basefmt=' ', markerfmt="yo")
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+def seventh():
+    fig, ax = plt.subplots()
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(0, 0.9, 10)
+    y = np.array([1.00000000e-03, 1.55052537e+00, 6.99586883e-01, 4.00416141e-01,
+ 4.38951453e-04 ,1.00000000e-03, 4.38951453e-04, 4.00416141e-01,
+ 6.99586883e-01, 1.55052537e+00])
+
+    plt.stem(x, y, basefmt=" ", markerfmt=" ")
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+def eigtth():
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.yaxis.tick_left()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.tick_bottom()
+
+    x = np.linspace(-1, 4, 2000)
+    ax.plot(x, np.cos(2*math.pi*0.5*x))
+    ax.plot(x, np.sin(2*math.pi*0.5*x), "r")
+    X = np.arange(-1, 5)
+    ax.stem(X, np.cos(2*math.pi*0.5*X), "g", basefmt=' ', markerfmt="go")
+    plt.savefig("out.png", dpi=300, transparent=True)
+
+eigtth()
+
 
