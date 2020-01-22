@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-T = np.array([0, 1, 2])  # Times, where we sample; equivalent to np.arange(3)
+T = np.array([0, 1, 2])  # Times where we sample; equivalent to np.arange(3)
 F = np.array([0.1, 0.3, 0.8])  # Frequencies
 A = np.array([3.1, 0.8, 1.4])  # Amplitudes
 

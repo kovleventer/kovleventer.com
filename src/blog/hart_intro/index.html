@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p><a href="https://en.wikipedia.org/wiki/Highway_Addressable_Remote_Transducer_Protocol">HART</a> is a widely used industrial grade communication protocol. One or many field devices can be queried or configured remotely via the use of HART commands. The goal of this writing is to provide a simple introduction to the software level of the protocol by short example codes.</p>
+		
+		<p>While HART claims to be an open protocol, I found the concrete specifications really hard to acquire, since they aren't public and are locked behind paywalls. With the few documentations available somewhere on the internet, one can set up a working communication channel, but this isn't an easy task. This article covers</p>
+		
+		<ul>
+			<li><b>software level</b>: not discussing how the digital signal is modulated to fit the 4-20mA analog signal without interference, but rather what commands to send to the serial port. Also in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>, this software level means the <b>data link layer</b> (and the lowest level of the appliation layer), not the physical or the full application layer.</li>
+			<li><b>HART 5</b> protocol version: fairly old but still relevant</li>
+			<li><b>wired serial</b> communication, so wireless is beyond the scope of this post</li>
+		</ul>
+		
+		<h2>Setting up with command zero</h2>
+		
+		<p>Assuming you have your field device wired in properly, and you have connected your HART modem to both the field device and your PC (USB-serial or serial; it doesn't matter), we are ready to write the first program. Our language of choice will be <a href="https://www.python.org/">python</a>, due to its simplicity, and relatively clean syntax, but you can use whatever language you prefer, as long as you can set up serial communication within it.</p>
+		
+		<p>With python, opening a serial port can be done in one line. Also the keyword arguments present nicely how the serial port should be set up: baudrate, parity, etc.</p>
+		
+		{{ code("serial_open.py") }}
+		
+		<p>We are ready to send our first command; command zero. I should mention now, that we are going to use the <b>hexadecimal</b> notation, so unless stated otherwise, a value of 67 means the hexadecimal value of 0x67.<p>
+		
+		{{ code("command_0.py", "python") }}
+		
+		<p>Most likely it was unclear what this command exactly does, so let's break it down into parts:</p>
+		
+		<p><span class="mono"><span class="strong_highlight_1">FF FF FF FF FF FF FF FF FF FF</span> <span class="strong_highlight_2">02</span> <span class="strong_highlight_3">80</span> <span class="strong_highlight_4">00</span> <span class="strong_highlight_5">00</span> <span class="strong_highlight_6">82</span></span></p>
+		
+		<ul>
+			<li><span class="strong_highlight_1">FF</span>: Preamble bytes. Each request and response starts with a sequence of full one bytes (FF) in order to help the endpoints detect a message. A preamble count of between 3 and 20 is advised, I found 10 sufficent in any case.</li>
+			<li><span class="strong_highlight_2">02</span>: Frame delimiter. Values ending with 1 inicate <b>burst mode</b>, when the filed device continuously sends sensor informations to the master. Values ending with 2 indicate normal <b>request</b>s, while values ending with 6 indicate <b>response</b>s. There is also a difference between addressing modes signified here: if the byte starts with 0, it indicates long addressing, while 8 means short. As you can see we are now making a request in short addressing mode.</li>
+			
+			<table>
+				<tr>
+					<th>Code</th>
+					<th>Meaning</th>
+				</tr>
+				<tr>
+					<td>0x01</td>
+					<td>Burst mode short access</td>
+				</tr>
+				<tr>
+					<td>0x02</td>
+					<td>Request short access</td>
+				</tr>
+				<tr>
+					<td>0x06</td>
+					<td>Response short access</td>
+				</tr>
+				<tr>
+					<td>0x81</td>
+					<td>Burst mode long access</td>
+				</tr>
+				<tr>
+					<td>0x82</td>
+					<td>Request long access</td>
+				</tr>
+				<tr>
+					<td>0x86</td>
+					<td>Response long access</td>
+				</tr>
+			</table>
+			
+			<li><span class="strong_highlight_3">80</span>: The short address, which is pretty short, only 4 bits long and half the remaining bits are used as a bitmask: The <span class="lo_yellow">first bit</span> indicates that the master sending this request is a primary master (a setup with multiple masters is possible, in that case the other masters are secondary), the <span class="lo_orange">second bit</span> tells us if the device is in burst mode (it isn't), and the <span class="lo_teal">last four bits</span> make the poll address up. There are 16 possible poll adresses and a device always occupies one of them. A setup with multiple slaves requires the usage of different poll address, but for configuring a single device, our best guess is poll address zero.</li>
+			<img src="media/short_address.svg">
+			
+			<li><span class="strong_highlight_4">00</span>: Command number. In this case the command number is zero, so nothing to explain further.</li>
+			
+			<li><span class="strong_highlight_5">00</span>: The length of the message (only the additional data part). This data part is used for storing parameters, but since command 0 has no parameters, the value of this byte will be zero.</li>
+			
+			<li><span class="strong_highlight_6">82</span>: Checksum. Calculated by <a href="https://en.wikipedia.org/wiki/Bitwise_operation#XOR">XOR</a>ing the all bytes in the frame excluding the preamble.</li>
+			
+			<div class="infobox warning">
+				<p>Since XORing two same bits result in zero, and XORing with a zero keeps the value inact, including the preambles in the checksum makes it valid, but only if the number of preamble bytes is even. If this number suddenly changes to and odd one, it may introduce hard to find bugs.</p>
+			</div>
+		</ul>
+		
+	</article>
+</body>
+</html>

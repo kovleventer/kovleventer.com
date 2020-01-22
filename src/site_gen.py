@@ -1,6 +1,7 @@
 import os
 import yaml
 from jinja2 import Environment, FileSystemLoader
+import datetime
 
 base_files = ["index", "about", "blog", "misc"]
 
@@ -28,7 +29,7 @@ def get_blog_entries():
         else:
             print("Warning: no config file found for", entry)
 
-    return entries
+    return sorted(entries, key=lambda e : e['date'], reverse=True)
 
 
 env = Environment(loader=FileSystemLoader(srcprefix))
