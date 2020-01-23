@@ -21,6 +21,8 @@
 			<li><b>wired serial</b> communication, so wireless is beyond the scope of this post</li>
 		</ul>
 		
+		<p>Also this article is not a documentation nor it aims to be one. The most important concepts are covered alongside with tips or warnings about my experience with these commands.</p>
+		
 		<h2>Setting up with command zero</h2>
 		
 		<p>Assuming you have your field device wired in properly, and you have connected your HART modem to both the field device and your PC (USB-serial or serial; it doesn't matter), we are ready to write the first program. Our language of choice will be <a href="https://www.python.org/">python</a>, due to its simplicity, and relatively clean syntax, but you can use whatever language you prefer, as long as you can set up serial communication within it.</p>
@@ -38,7 +40,7 @@
 		<p><span class="mono"><span class="strong_highlight_1">FF FF FF FF FF FF FF FF FF FF</span> <span class="strong_highlight_2">02</span> <span class="strong_highlight_3">80</span> <span class="strong_highlight_4">00</span> <span class="strong_highlight_5">00</span> <span class="strong_highlight_6">82</span></span></p>
 		
 		<ul>
-			<li><span class="strong_highlight_1">FF</span>: Preamble bytes. Each request and response starts with a sequence of full one bytes (FF) in order to help the endpoints detect a message. A preamble count of between 3 and 20 is advised, I found 10 sufficent in any case.</li>
+			<li><span class="strong_highlight_1">FF</span>: Preamble bytes. Each request and response starts with a sequence of full one bytes (FF) in order to help the endpoints detect a message. A preamble count of between 5 and 20 is advised, I found 10 sufficent in any case.</li>
 			<li><span class="strong_highlight_2">02</span>: Frame delimiter. Values ending with 1 inicate <b>burst mode</b>, when the filed device continuously sends sensor informations to the master. Values ending with 2 indicate normal <b>request</b>s, while values ending with 6 indicate <b>response</b>s. There is also a difference between addressing modes signified here: if the byte starts with 0, it indicates long addressing, while 8 means short. As you can see we are now making a request in short addressing mode.</li>
 			
 			<table>
@@ -72,7 +74,7 @@
 				</tr>
 			</table>
 			
-			<li><span class="strong_highlight_3">80</span>: The short address, which is pretty short, only 4 bits long and half the remaining bits are used as a bitmask: The <span class="lo_yellow">first bit</span> indicates that the master sending this request is a primary master (a setup with multiple masters is possible, in that case the other masters are secondary), the <span class="lo_orange">second bit</span> tells us if the device is in burst mode (it isn't), and the <span class="lo_teal">last four bits</span> make the poll address up. There are 16 possible poll adresses and a device always occupies one of them. A setup with multiple slaves requires the usage of different poll address, but for configuring a single device, our best guess is poll address zero.</li>
+			<li><span class="strong_highlight_3">80</span>: The short address which is only 4 bits long and half the remaining bits are used as a bitmask: The <span class="lo_yellow">first bit</span> indicates that the master sending this request is a primary master (a setup with multiple masters is possible, in that case the other masters are secondary), the <span class="lo_orange">second bit</span> tells us if the device is in burst mode (it isn't), and the <span class="lo_teal">last four bits</span> make the poll address up. There are 16 possible poll adresses and a device always occupies one of them. A setup with multiple slaves requires the usage of different poll addresses, but for configuring a single device, our best guess is usually address zero.</li>
 			<img src="media/short_address.svg">
 			
 			<li><span class="strong_highlight_4">00</span>: Command number. In this case the command number is zero, so nothing to explain further.</li>
@@ -85,6 +87,77 @@
 				<p>Since XORing two same bits result in zero, and XORing with a zero keeps the value inact, including the preambles in the checksum makes it valid, but only if the number of preamble bytes is even. If this number suddenly changes to and odd one, it may introduce hard to find bugs.</p>
 			</div>
 		</ul>
+		
+		<p>After a request we await for the response. We usually don't know the response size beforehand, so the easiest way is to allocate a buffer large enough to store any answer.</p>
+		
+		{{ code("command_resp.py", "python") }}
+		
+		<p><span class="mono"><span class="strong_highlight_1">FF FF FF FF FF</span> <span class="strong_highlight_2">06</span> <span class="strong_highlight_3">80</span> <span class="strong_highlight_4">00</span> <span class="strong_highlight_5">0E</span> <span class="strong_highlight_7">00</span> <span class="strong_highlight_8">80</span> <span class="strong_highlight_9">FE</span> <span class="strong_highlight_10">26</span> <span class="strong_highlight_11">3B</span> <span class="strong_highlight_12">06</span> <span class="strong_highlight_13">05 02 01 20</span> <span class="strong_highlight_14">00</span> <span class="strong_highlight_15">2A BC 31</span> <span class="strong_highlight_6">6C</span></span></p>
+		
+		<p>Breaking it down:</p>
+		
+		<ul>
+			<li><span class="strong_highlight_1">FF</span>: The field device also sends preambles as well. In order to make this section less repetitive, I am goind to omit parts which were already covered.</li>
+			<li><span class="strong_highlight_2">06</span>: As you can see, 06 means response.</li>
+			<li><span class="strong_highlight_5">0E</span>: We have 0x0E pieces of data bits (14 in decimal) which means the next 14 bytes will be the data of the response.</li>
+			<li><span class="strong_highlight_7">00</span>: Response code / error code / communication status. If the first bit is active, then it indicates a communication error: something went wrong during the serial transmission, and the remaining seven bits indicate the error. Otherwise if the first bit is off, this byte should be interpreted as a response code, 00 means everything is fine, different values mean different errors, but they are device and command specific.</li>
+			<li><span class="strong_highlight_8">80</span>: Similar status bitfield as the previous one, but this time the actual bits are more clearly defined:</li>
+			<table>
+				<tr>
+					<th>Active bit</th>
+					<th>Meaning</th>
+				</tr>
+				<tr>
+					<td>0x80</td>
+					<td>Device Malfunction</td>
+				</tr>
+				<tr>
+					<td>0x40</td>
+					<td>Configuration Changed</td>
+				</tr>
+				<tr>
+					<td>0x20</td>
+					<td>Cold Start</td>
+				</tr>
+				<tr>
+					<td>0x10</td>
+					<td>More Status Available</td>
+				</tr>
+				<tr>
+					<td>0x08</td>
+					<td>Loop Current Fixed</td>
+				</tr>
+				<tr>
+					<td>0x04</td>
+					<td>Loop Current Saturated</td>
+				</tr>
+				<tr>
+					<td>0x02</td>
+					<td>Non-Primary Variable Out of Limits</td>
+				</tr>
+				<tr>
+					<td>0x01</td>
+					<td>Primary Variable Out of Limits</td>
+				</tr>
+			</table>
+			<p>As you can see some of them are perfectly normal: cold start and configuration changed usually occurs when calibrating a device. Other codes indicate light or severe errors. More Status Available means you have to issue a specific command to retrieve this additional status info.</p>
+			
+			<li><span class="strong_highlight_9">FE</span>: The value of this byte is always 0xFE (decimal 254).</li>
+			<li><span class="strong_highlight_10">26</span>: Device manufacturer's ID. You can use <a href="https://en.wikipedia.org/wiki/Highway_Addressable_Remote_Transducer_Protocol#Manufacturer_codes">this</a> or any other table you find to check the manufacturer, which is Rosemount in our case. Since this information is held in just one byte, newer manufacturers might not appear on this table as there were no place left for them, getting the actual manufacturer might be harder this case and might require specific commands to achieve.</li>
+			
+			<li><span class="strong_highlight_11">3B</span>: Manufacturer's device ID, purely manufacturer specific.</li>
+			<li><span class="strong_highlight_12">06</span>: Number of preambles required by the device for requests. You can probably get away with a few more or less bytes, but you should follow this guideline if your working environment allows it (for example you are not restricted to fixed length messages). Also note that this is NOT the same as the number of preambles the device sends on response (it was 5 in our case); this might be an other source of bugs.</li>
+			
+			<li><span class="strong_highlight_13">05 02 01 20</span>: Revision numbers. In order: Command set (5 means HART 5 in this case), Transmitter specific revision code, Software revision, Hardware revision. They may be useful when debugging.</li>
+			
+			<li><span class="strong_highlight_14">00</span>: Flags, I have never seen them in use. You can probably find the meaning of its respective bits in some documentation, but for the devices I used, they never presented any usable information.</li>
+			
+			<li><span class="strong_highlight_15">2A BC 31</span>: Device ID number, which is supposed to be unique for each and every device form the same manufacturer with the same device ID. The three bytes represent a 24 bit integer, but I found confliction information about its <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>. While you are going to use this value later with long addressing, this number will get converted back to bytes, so the <i>interpretation</i> of the bytes doesn't really matter, only their values do.</li>
+			
+			<li><span class="strong_highlight_6">6C</span>: Checksum is calculated in the response as well.</li>
+		</ul>
+		
+		<h2>Read dynamic variables with command 3</h2>
 		
 	</article>
 </body>

@@ -216,7 +216,7 @@
 			<p>This is a rather unorthodox way to introduce DFT. Most texts I've seen introduced complex signals first which simplified a lot of things. The signals were complex, the amplitudes were complex and the matrix was complex as well with exponential e^(jφ) terms handling all kinds of phases. And since any single term held twice amount of value or information now, the Gaussian elimination worked just as well as before when we only had cosines and real numbers. But this all came at the cost of complex signals don't really exist and finding a real world use case for them would have been really hard. Also I stated in the motivation section, that we are going to analyse real signals, so why would we switch to complex ones suddenly? After the definition, we would have seen, that for the special case of real numbers, the spectrum (range of amlitudes) is <i>coincidentally</i> symmetric, so we can discard half our results, but this way you've seen why: to extract twice as much information from our system (amplitude and phase), we had to supply twice as much data as well.</p>
 		</div>
 		
-		<p>Let's see how such a synthesis matrix looks like for N=4. To get real values as a result, we would have to construct our amplitude vector in a special way to be symmetric, so now we aren't going to use this matrix for synthesis, but to help construct our analysis matrix.</p>
+		<p>Let's see how such a synthesis matrix looks like for N=4. To get real values as a result, we would have to construct our amplitude vector in a special way to be symmetric, so now we aren't going to use this matrix for synthesis, but to help to construct our analysis matrix.</p>
 		
 		{{ formula("dft_idft_matrix.tex", 24) }}
 		
@@ -247,7 +247,7 @@
 		
 		{{ formula("dft_idft_wmatrix_simp4.tex", 24) }}
 		
-		<p>While this matrix is fun to play with, we still haven't seen why that would be useful for us. To see this in practice, we will need to do some analysis with this matrix, or to be more precise, with its inverse. Finding the inverse of a matrix is really a grueling task. For an n by n matrix, the time complexity of inversion is O(n^3) which is a <i>lot</i>. Suppose we have a 1 sec. sound file sampled with the standard CD sample rate of 44100 Hz, that means 44100 samples as well, and to analyse the frequency components of this file, we would roughly need <b>85 766 121 000 000</b> operations. Eighty-five trillion (!), which is completely unfeasible. Can we find a faster inversion method? The answer to these kind of questions is always yes, otherwise the DFT would be trash, and I wouldn't have introduced it in the first place.</p>
+		<p>While this matrix is fun to play with, we still haven't seen why that would be useful for us. To see this in practice, we will need to do some analysis with this matrix, or to be more precise, with its inverse. Finding the inverse of a matrix is really a grueling task. For an n by n matrix, the time complexity of inversion is O(n^3) which is  <i>huge</i>. Suppose we have a 1 sec. sound file sampled with the standard CD sample rate of 44100 Hz. That means 44100 samples as well, and to analyse the frequency components of this file, we would roughly need <b>85 766 121 000 000</b> operations. Eighty-five trillion (!), which is completely unfeasible. Can we find a faster inversion method? The answer to these kind of questions is always yes, otherwise the DFT would be trash, and I wouldn't have introduced it in the first place.</p>
 		
 		<p>As a beginning, take a look at what the sums of each columns are:</p>
 		
@@ -260,19 +260,19 @@
 		
 		<img src="media/dft_diffcol.svg">
 		
-		<p>This is all nice and good: 2-2 is 0 indeed. 3-1 is 2, and as we can see the result wraps around, so in the third row W^1 - W^2 = W^(-1) = W^4. But what about 1-3? How can we have negative indices? Turns out that since frequencies with the same fractional part are indistinguishable, the whole matrix can be written and pasted infinitely many times, placed in a row. 1-3 is -2, which will correspond to the same column as 3. The crucial thing here that if two indices are different, the difference of their columns will never be a full one column (-5, 0, or 5), which is easy to prove. If we were doing multiplication instead of division, we would be adding those indices, and two different indices could produce a full one column: 2 plus 3 is 5.</p>
+		<p>This is all nice and good: 2-2 is 0 indeed. 3-1 is 2, and as we can see the result wraps around, so in the third row W^1 - W^2 = W^(-1) = W^4. But what about 1-3? How can we have negative indices? Turns out that since frequencies with the same fractional part are indistinguishable, the whole matrix can be written and pasted infinitely many times, placed in a row. 1-3 is -2, which will correspond to the same column as 3. The crucial thing here is that if two indices are different, the difference of their columns will never be a full one column (-5, 0, or 5), which is easy to prove. If we were doing multiplication instead of division, we would be adding those indices, and two different indices could produce a full one column: 2 plus 3 is 5.</p>
 		
 		<p><b>How does any of the above help in finding the inverse of this matrix?</b> Well, I said earlier that the matrix is symmetric, which means that I can divide a row with a column, a column with a row or a row with a row alongside the same principles. If I were to multiply this matrix with itself, what would I get is columns multiplied by rows elementwise, than taking the sum of the resulting vector. Almost good, except as I said, we need to do a division instead of multiplication. To do this, we can define an operation called <b>conjugation</b>, which turns the exponent negative for a complex number.</p>
 		
 		{{ formula("dft_conjugate.tex", 28, amsmath=False) }}
 		
-		<p>If we take the conjugate of the whole matrix (elementwise) and multiply i with our original matrix, this is what we get:</p>
+		<p>If we take the conjugate of the whole matrix (elementwise) and multiply it with our original matrix, this is what we get:</p>
 		
 		<figure>
 			<canvas id="dft_inverse"></canvas>
 		</figure>
 		
-		<p>If we multiply a matrix with its inverse, we should get the <b>identity</b> matrix back. This is not yet the case, but we are very close. We have three options to finish this now.</p>
+		<p>If we multiply a matrix with its inverse, we should get the <b>identity</b> matrix back (only the main diagonal elements are one, everything else is zero). This is not yet the case, but we are very close. We have three options to finish this now.</p>
 		
 		<ol>
 			<li>Divide the conjugate matrix by N, so we can solve our original problem easily.</li>
@@ -325,9 +325,9 @@
 			</tr>
 		</table>
 		
-		<p>Ignoring rounding errors, we did a good job. The highest frequency component (0.8 with amplitude of 1.4) got degraded into the frequency bin of two as it should have happened. Notice that we also extended the number of samples to 10. The results we would have gotten from 6 bins would have been usable, but they wouldn't been ideal for demonstrating that our method, the DFT works indeed.</p>
+		<p>Ignoring rounding errors, we did a good job. The highest frequency component (0.8 with amplitude of 1.4) got degraded into the frequency bin of two as it should have happened. Notice that we also extended the number of samples to 10. The results we would have gotten from 6 bins would have been usable, but they wouldn't have been ideal for demonstrating that our method, the DFT works indeed.</p>
 		
-		<p>Our last graph, where we plotted the amplitudes against the frequency bins is called the <b>spectrum</b>. To be honest I haven't given a formal definition of the DFT yet, which maybe puts the resulting function in perspective. In practice, our signal is comprised of lots of samples, so when plotted, it looks like a continous signal. The same can be said for this spectrum; F(f) is just another discrete signal. Also if you look at definitions from other sources, you'll se that they prefer the usage of sqare brackets whenever dealing with discrete signals, so do I.</p>
+		<p>Our last graph, where we plotted the amplitudes against the frequency bins is called the <b>spectrum</b>. To be honest I haven't given a formal definition of the DFT yet, which maybe puts the resulting function in perspective. In practice, our signal is comprised of lots of samples, so when plotted, it looks like a continous signal. The same can be said for this spectrum; F(f) is just another discrete signal. Also if you look at definitions from other sources, you'll se that they prefer the usage of sqare brackets whenever dealing with discrete signals, so do I now.</p>
 		
 		{{ formula("dft_definition.tex", 24, amsmath=False) }}
 		
@@ -341,7 +341,7 @@
 		
 		<p>The length of the resulting spectrum is 4097. Notice something odd: even though rfft roughly halved our values, there is still an off by one error in both this and the earlier example. From ten samples, how could we extract the amplitudes and phases for not just five, but six frequency bins?</p>
 		
-		<p>The <b>DC term</b> has no phase, since it is a constant function; shifting it left or right does not change its shape. With that we gained an additional value, but we still need one more. Turns out that the <b>Nyquist frequency</b> holds no phase as well: for <span class="dft_red">sine</span> parts, the value of this component is always zero, and for <span class="dft_blue">cosine</span> parts the value oscillates between 1 and -1. The only way to change its value by shifting is to take its opposite, but even in that case, there is no need to store the phase for this frequency as well. Everything is in order now, from 10 samples, we could extract data for 4 complex numbers and 2 reals. 4*2+2 = 10</p>
+		<p>The <b>DC term</b> has no phase, since it is a constant function; shifting it left or right does not change its shape. With that we gained an additional value, but we still need one more. Turns out that the <b>Nyquist frequency</b> holds no phase as well: for <span class="plt_red">sine</span> parts, the value of this component is always zero, and for <span class="plt_blue">cosine</span> parts the value oscillates between 1 and -1. The only way to change its value by shifting is to take its opposite, but even in that case, there is no need to store the phase for this frequency as well. Everything is in order now, from 10 samples, we could extract data for 4 complex numbers and 2 reals. 4*2+2 = 10</p>
 		
 		<img src="media/dft_nyquist_half.png">
 		
