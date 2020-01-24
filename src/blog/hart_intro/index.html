@@ -159,6 +159,112 @@
 		
 		<h2>Read dynamic variables with command 3</h2>
 		
+		<p>We are now going to take a look at long addressing mode and dealing with floating point numbers.</p>
+		
+		{{ code("command_3.py", "python") }}
+		
+		<p>Again breaking down to parts:</p>
+		
+		<p><span class="mono"><span class="strong_highlight_1">FF FF FF FF FF FF</span> <span class="strong_highlight_2">82</span> <span class="strong_highlight_10">A6</span> <span class="strong_highlight_11">3B</span> <span class="strong_highlight_15">2A BC 31</span> <span class="strong_highlight_4">03</span> <span class="strong_highlight_5">00</span> <span class="strong_highlight_6">6C</span></span></p>
+		
+		<ul>
+			<li><span class="strong_highlight_2">82</span>: Indicates long mode request.</li>
+			<li><span class="strong_highlight_10">A6</span>: A long address is comprised of 5 bytes. The first byte is the same as the <span class=lo_teal>manufacturer ID</span> but with the first 2 bits used as a bitfield seen before. Again, the <span class="lo_yellow">first bit</span> is active if a primary master is asking, and the <span class="lo_orange">second</span> indicates burst mode.</li>
+			<img src="media/long_address.svg">
+			<li><span class="strong_highlight_11">3B</span>: Manufacturer's device ID, unchanged.</li>
+			<li><span class="strong_highlight_15">2A BC 31</span>: Device ID number, you can paste the same bytes as read from command 0, that is why I did not bother with an integer respresentation.</li>
+			<li><span class="strong_highlight_4">03</span>: Command 3 and the rest is the same.</li>
+		</ul>
+		
+		<p>And the response:</p>
+		
+		{{ code("command_resp.py", "python") }}
+		
+		<p><span class="mono">FF FF FF FF FF 86 A6 3B 2A BC 31 03 1A <span class="strong_highlight_7">00</span> <span class="strong_highlight_8">80</span> <span class="strong_highlight_17">41 AE 00 00</span></span></p>
+		<p><span class="mono"><span class="strong_highlight_16">20</span> <span class="strong_highlight_17">46 1C 3F F6</span> <span class="strong_highlight_16">24</span> <span class="strong_highlight_17">7F A0 00 00</span> <span class="strong_highlight_16">24</span> <span class="strong_highlight_17">7F A0 00 00</span> <span class="strong_highlight_16">24</span> <span class="strong_highlight_17">7F A0 00 00</span> 82</span></p>
+		
+		<p>The line break has no special meaning, it is only there to stop the text from overflowing. Also to reduce visual clutter, only the data bytes are highlighted now.</p>
+		
+		<ul>
+			<li><span class="strong_highlight_7">00</span> <span class="strong_highlight_8">80</span>: Status and error codes work the same way as seen before.</li>
+			<li><span class="strong_highlight_17">41 AE 00 00</span>: Five values were sent back. Each value except the first is preceded by an unit type indicator byte (<span class="strong_highlight_16">24</span>, <span class="strong_highlight_16">20</span>), and you should read the concrete unit type from a table similar to the manufacturer one. The first value tells us the current, the second is the primary variable which is always sent. Secondary, tertiary and quaternary variables belong to different miscellaneous sensors. Sometimes they contain valid data, sometimes only something constant invalid value is sent, and sometimes they don't even get sent at all, in this case the response is shorter.</li>
+			
+			<table class="pc75">
+				<tr>
+					<th>Meaning</th>
+					<th>Raw bytes</th>
+					<th>Value</th>
+					<th>Unit code</th>
+					<th>Unit type</th>
+				</tr>
+				<tr>
+					<td>Current</td>
+					<td>41 AE 00 00</td>
+					<td>21.75</td>
+					<td>-</td>
+					<td>mA</td>
+				</tr>
+				<tr>
+					<td>Primary</td>
+					<td>46 1C 3F F6</td>
+					<td>9999.99</td>
+					<td>20</td>
+					<td>°C</td>
+				</tr>
+				<tr>
+					<td>Secondary</td>
+					<td>7F A0 00 00</td>
+					<td>NaN</td>
+					<td>24</td>
+					<td>mV</td>
+				</tr>
+				<tr>
+					<td>Tertiary</td>
+					<td>7F A0 00 00</td>
+					<td>NaN</td>
+					<td>24</td>
+					<td>mV</td>
+				</tr>
+				<tr>
+					<td>Quaternary</td>
+					<td>7F A0 00 00</td>
+					<td>NaN</td>
+					<td>24</td>
+					<td>mV</td>
+				</tr>
+			</table>
+			<p>No sensors were connected to the field device hence the invalid values. Also the floats are interpreted as <b>big endian</b>.</p>
+		</ul>
+		
+		<h2>Read message with command 12 (0x0C)</h2>
+		
+		<p>As now almost every data type is covered except the packed strings. As a final example we are going to read the message written into our field device.</p>
+		
+		{{ code("command_12.py", "python") }}
+		
+		<p>The command structure shouldn't require any explaination now.</p>
+		
+		<p><span class="mono">FF FF FF FF FF FF 82 A6 3B 2A BC 31 0C 00 B4</span></p>
+		
+		<p>And the response is:<p>
+		
+		{{ code("command_resp.py", "python") }}
+		
+		<p><span class="mono">FF FF FF FF FF 86 A6 3B 2A BC 31 0C 1A <span class="strong_highlight_7">00</span> <span class="strong_highlight_8">80</span></span></p>
+		<p><span class="mono"><span class="strong_highlight_16">64 54 E0</span> <span class="strong_highlight_16">25 48 17</span> <span class="strong_highlight_16">3D 22 D3</span> <span class="strong_highlight_16">82 08 20</span> <span class="strong_highlight_16">82 08 20</span> <span class="strong_highlight_16">82 08 20</span> <span class="strong_highlight_16">82 08 20</span> <span class="strong_highlight_16">82 08 20</span> 63</span></p>
+		
+		<p>All the returned data is one 32 characters long string. Each character is stored on 6 bits using some <a href="https://en.wikipedia.org/wiki/Base64">base64</a>-like encoding, so the whole byte sequence is 24 bytes long. That also means that we can decode this stream 3 bytes at a time. Take a look at the first bunch:</p>
+		
+		<img src="media/stringpack.svg">
+		
+		<p>The full string says: "YES IT WORKS" followed by a buch of padding spaces. The encoding of the 6 bit characters is based on the <a href="https://hu.wikipedia.org/wiki/ASCII">ASCII</a> table, but with some tweaks:</p>
+		
+		<img src="media/ascii_hart.svg">
+		
+		<h2>Endnote</h2>
+		
+		<p>There are three main command groups defined in HART. <b>Universal</b> commands must be implemented in each device, <b>common practice</b> commands should be implemented, and <b>device specific</b> commands are specific to manufacturer and device type as the name suggests. Our three example commands were universal commands, but common practice ones work in a similar manner. Device specific command on the other hand usually require DD libraries, where request and response commands with their data types are defined. Sadly the format of these libraries are even more obscure than the regular HART command formats, so I have no information about them.</p>
+		
 	</article>
 </body>
 </html>

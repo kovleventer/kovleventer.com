@@ -1,0 +1,1 @@
+s.write(bytes.fromhex("FFFFFFFFFFFF82A63B2ABC310C00B4"))
