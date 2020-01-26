@@ -36,11 +36,63 @@ namespace Color {
 		return (r << 16) | (g << 8) | b;
 	}
 	
+	void HSVtoRGB(int H, double S, double V, int output[3]) {
+		double C = S * V;
+		double X = C * (1 - std::abs(std::fmod(H / 60.0, 2) - 1));
+		double m = V - C;
+		double Rs, Gs, Bs;
+
+		if(H >= 0 && H < 60) {
+			Rs = C;
+			Gs = X;
+			Bs = 0;	
+		}
+		else if(H >= 60 && H < 120) {	
+			Rs = X;
+			Gs = C;
+			Bs = 0;	
+		}
+		else if(H >= 120 && H < 180) {
+			Rs = 0;
+			Gs = C;
+			Bs = X;	
+		}
+		else if(H >= 180 && H < 240) {
+			Rs = 0;
+			Gs = X;
+			Bs = C;	
+		}
+		else if(H >= 240 && H < 300) {
+			Rs = X;
+			Gs = 0;
+			Bs = C;	
+		}
+		else {
+			Rs = C;
+			Gs = 0;
+			Bs = X;	
+		}
+
+		output[0] = (Rs + m) * 255;
+		output[1] = (Gs + m) * 255;
+		output[2] = (Bs + m) * 255;
+	}
+	
 	int angleToColor(float angle) {
-		int r = (angle / M_PI / 2 + 0.5) * 255;
-		int g = (-angle / M_PI / 2 + 0.5) * 255;
-		int b = 0;
-		return rgbToColor(r, g, b);
+		int H;
+		double S, V = 1;
+		if (angle >= 0 && angle < M_PI-.01) {
+			H = (angle / M_PI) * 360;
+			S = 0.75;
+			V = 1;
+		} else {
+			H = (angle / M_PI + 1) * 360;
+			S = 0.5;
+			V = 1;
+		}
+		int rgb[3];
+		HSVtoRGB(H, S, V, rgb);
+		return rgbToColor(rgb[0], rgb[1], rgb[2]);
 	}
 	
 	

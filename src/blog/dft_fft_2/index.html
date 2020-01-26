@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p>In the <a href="/blog/dft_fft_1">previous part</a>, we showed how we could build signals from sinusoids, and how to analyse built signals to get their components back. Inverting the matrix using Gaussian elimination showed to be really slow bu we could accelerate that using the easily invertible DFT matrix. Much faster, right? Multiplying an <i>n</i> by </i>n</i> matrix with an <i>n</i> long vector is an O(n^2) operation. With a 1 second long signal and a sample rate of 44100 Hz, that still means <b>1 944 810 000</b>, almost two billion steps.</p>
+		
+		<h2>Going faster</h2>
+		
+		<p>Take a look at the DFT matrix defined before. Now instead of the powers of W, the angles in radians will be shown for each element.</p>
+		
+		<figure>
+			<canvas id="dft_matrices"></canvas>
+			<input type="range" id="dft_size" min="1" max="10" value="1">
+			<input type="checkbox" id="dft_colored">
+			<label for="dft_colored">Colored</label>
+		</figure>
+		
+		<p>Complex functions are oftben plotted with <a href="https://en.wikipedia.org/wiki/Domain_coloring">domain coloring</a> but this is not the case now. From zero to π, the whole range of hues are covered with a bright saturation. From -π to zero (and π as well since -π is the same as π) the same range is covered buth with a slighlitly lower saturation. As result, points atthe opposite side of the circle will share the same hue and they'll only differ in saturation.<p>
+		
+		
+		
+	</article>
+	<script src="chscript.js"></script>
+</body>
+</html>
