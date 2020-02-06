@@ -86,7 +86,7 @@ namespace Color {
 			S = 0.75;
 			V = 1;
 		} else {
-			H = (angle / M_PI + 1) * 360;
+			H = (angle / M_PI - 1) * 360;
 			S = 0.5;
 			V = 1;
 		}

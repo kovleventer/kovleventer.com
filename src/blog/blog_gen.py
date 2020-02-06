@@ -52,7 +52,7 @@ def render_tex(filename, fontsize=24, amsmath=True, inline=False):
     return '<img class="formula' + ('_inline"' if inline else '"') + ' src="' + svg + '">'
 
 
-config = os.path.join(folder, "config.yaml")
+config = os.path.join(folder, "config.yml")
 html = os.path.join(folder, "index.html")
 
 with open(config) as f:

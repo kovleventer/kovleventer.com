@@ -13,13 +13,13 @@
 #include <locale>
 #include <cmath>
 
-extern "C" [[cheerp::genericjs]] [[cheerp::jsexport]]
+extern "C" [[cheerp::jsexport]]
 void hi_freq() {
 	client::HTMLImageElement* element = static_cast<client::HTMLImageElement*>(client::document.getElementById("signal"));
 	element->set_src("media/signal_hifreq.png");
 }
 
-extern "C" [[cheerp::genericjs]] [[cheerp::jsexport]]
+extern "C" [[cheerp::jsexport]]
 void lo_freq() {
 	client::HTMLImageElement* element = static_cast<client::HTMLImageElement*>(client::document.getElementById("signal"));
 	element->set_src("media/signal_lowfreq.png");
@@ -53,12 +53,10 @@ void mouseMoveSynth(int X, int Y) {
 	synthesisMTX.render(synthesisMTXCanvas);
 }
 
-[[cheerp::genericjs]]
 void mouseMoveJS(client::MouseEvent* e) {
 	mouseMoveSynth(e->get_offsetX(), e->get_offsetY());
 }
 
-[[cheerp::genericjs]]
 void mouseExitJS(client::MouseEvent* e) {
 	mouseMoveSynth(-100, -100);
 }
@@ -92,7 +90,8 @@ void constructSynthMatrices() {
 CanvasPTR expSinCosCanvas;
 double t = 0;
 
-void updateExp() {
+
+void updateExp(void) {
 	Graphics::clear(expSinCosCanvas);
 	t -= 0.02;
 	double tt = t + 0.6;
@@ -116,7 +115,7 @@ void updateExp() {
 	
 	for (int i = 0; i < 400; i++) {
 		double t_1 = t + i * 0.11;
-		double t_2 = t + (i+1) * 0.11; // squiggly but idk why
+		double t_2 = t_1 + 0.11; // squiggly but idk why
 		
 		Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t_1)*r, h-r-rr-r-(t_1 - t)*10, r+rr + std::cos(t_2)*r, h-r-rr-r-(t_2 - t)*10, Color::MAT_CYAN_700);
 		Graphics::drawLine(expSinCosCanvas, rr+r+r+(t_1 - t)*10, h-r-rr + std::sin(t_1)*r, rr+r+r+(t_2 - t)*10, h-r-rr + std::sin(t_2)*r, Color::MAT_GREEN_700);
@@ -129,12 +128,6 @@ void updateExp() {
 	Graphics::drawLine(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, r + rr, h-r-rr, Color::GRAY);
 	Graphics::fillCircle(expSinCosCanvas, r+rr + std::cos(t)*r, h-r-rr + std::sin(t)*r, rr, 0, 2 * M_PI, Color::MAT_RED_700);
 	
-}
-
-
-[[cheerp::genericjs]]
-void updateExpJS(void) {
-	updateExp();
 }
 
 Scene synthesisSCMTX;
@@ -206,20 +199,19 @@ void mouseMoveSynthSC(int X, int Y) {
 	synthesisSCMTX.render(synthesisSCMTXCanvas);
 }
 
-[[cheerp::genericjs]]
 void mouseMoveSCJS(client::MouseEvent* e) {
 	mouseMoveSynthSC(e->get_offsetX(), e->get_offsetY());
 }
 
-[[cheerp::genericjs]]
 void mouseExitSCJS(client::MouseEvent* e) {
 	mouseMoveSynthSC(-100, -100);
 }
 
 CanvasPTR dftWRotCanvas;
-[[cheerp::genericjs]] client::HTMLInputElement *dftWRotRange;
+client::HTMLInputElement *dftWRotRange;
 
-void renderDFTWRot(int value) {
+void renderDFTWRotJS() {
+	int value = getNumericInput(dftWRotRange);
 	Graphics::clear(dftWRotCanvas);
 	
 	int w = 400;
@@ -236,12 +228,6 @@ void renderDFTWRot(int value) {
 	Graphics::setLineWidth(dftWRotCanvas, 8);
 	Graphics::drawLine(dftWRotCanvas, w/2, h/2, w/2+std::cos(2*M_PI*value/5)*(r+10), h/2-std::sin(2*M_PI*value/5)*(r+10), Color::MAT_RED_700);
 	Graphics::drawText(dftWRotCanvas, (std::string("f*t*N=") + std::to_string(value)).c_str(), w*3/4, 40, Color::GRAY, "center", "middle", 30);
-}
-
-[[cheerp::genericjs]]
-void renderDFTWRotJS() {
-	int value = getNumericInput(dftWRotRange);
-	renderDFTWRot(value);
 }
 
 Scene dftInverse;
@@ -301,17 +287,14 @@ void mouseExitDFTI(int X, int Y) {
 	dftInverse.render(dftInverseCanvas);
 }
 
-[[cheerp::genericjs]]
 void mouseMoveDFTIJS(client::MouseEvent* e) {
 	mouseExitDFTI(e->get_offsetX(), e->get_offsetY());
 }
 
-[[cheerp::genericjs]]
 void mouseExitDFTIJS(client::MouseEvent* e) {
 	mouseExitDFTI(-100, -100);
 }
 
-[[cheerp::genericjs]]
 void initSynth() {
 	synthesisMTX = Scene();
 	int w=520, h=400;
@@ -324,13 +307,11 @@ void initSynth() {
 	synthesisMTX.render(synthesisMTXCanvas);
 }
 
-[[cheerp::genericjs]]
 void initExp() {
 	expSinCosCanvas = Graphics::createCanvas("expo_sin_cos", 500, 500);
-	Graphics::setRenderCallback(expSinCosCanvas, updateExpJS);
+	Graphics::setRenderCallback(expSinCosCanvas, updateExp);
 }
 
-[[cheerp::genericjs]]
 void initSynthSinCos() {
 	synthesisSCMTX = Scene();
 	int w=850, h=650;
@@ -343,7 +324,6 @@ void initSynthSinCos() {
 	synthesisSCMTX.render(synthesisSCMTXCanvas);
 }
 
-[[cheerp::genericjs]]
 void initDFTWRot() {
 	dftWRotCanvas = Graphics::createCanvas("dft_wrot", 400, 400);
 	dftWRotRange = static_cast<client::HTMLInputElement*>(client::document.getElementById("dft_wrot_exp"));
@@ -351,7 +331,6 @@ void initDFTWRot() {
 	renderDFTWRotJS();
 }
 
-[[cheerp::genericjs]]
 void initDFTInverse() {
 	dftInverse = Scene();
 	int w=550, h=550;
@@ -364,7 +343,6 @@ void initDFTInverse() {
 	dftInverse.render(dftInverseCanvas);
 }
 
-[[cheerp::genericjs]]
 void webMain() {
 	initSynth();
 	initExp();

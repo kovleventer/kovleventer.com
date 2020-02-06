@@ -25,6 +25,17 @@ public:
 		canvasCtx = (client::CanvasRenderingContext2D*)canvas->getContext("2d");
 	}
 	
+	static Canvas createEmptyCanvas(int width, int height) {
+		Canvas c;
+		c.canvas = (client::HTMLCanvasElement*)client::document.createElement("canvas");
+		c.canvas->set_width(width);
+		c.canvas->set_height(height);
+		c.width = width;
+		c.height = height;
+		c.canvasCtx = (client::CanvasRenderingContext2D*)(c.canvas->getContext("2d"));
+		return c;
+	}
+	
 	void fillRect(int x, int y, int width, int height, int rgb) {
 		int r = (rgb>>16)&0xff;
 		int g = (rgb>>8)&0xff;
@@ -83,6 +94,10 @@ public:
 		canvasCtx->moveTo(x1, y1);
 		canvasCtx->lineTo(x2, y2);
 		canvasCtx->stroke(); 
+	}
+	
+	void blitCanvas(Canvas& c) {
+		canvasCtx->drawImage(c.canvas, 0, 0, c.width, c.height, 0, 0, width, height);
 	}
 	
 	void setLineWidth(int w) {

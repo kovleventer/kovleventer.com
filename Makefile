@@ -9,14 +9,13 @@ CHEERP_LIB := src/lib/cheerp
 CHEERP_BASE_NAME := chscript
 TS_BASE_NAME := tscript
 
-CHEERP_FLAGS := -target cheerp -cheerp-mode=wasm -O2 -I$(CHEERP_LIB)
+CHEERP_FLAGS := -target cheerp -O2 -I$(CHEERP_LIB)
 
-BLOG_ENTRIES := $(shell find src/blog -type f -name config.yaml)
-BLOG_FOLDERS := $(patsubst %config.yaml, %, $(BLOG_ENTRIES))
+BLOG_ENTRIES := $(shell find src/blog -type f -name config.yml)
+BLOG_FOLDERS := $(patsubst %config.yml, %, $(BLOG_ENTRIES))
 BLOG_BUILD_FOLDERS := $(patsubst src%, build%, $(BLOG_FOLDERS))
 BLOG_HTMLS := $(patsubst %, %index.html, $(BLOG_BUILD_FOLDERS))
 BLOG_CHJS := $(patsubst %, %$(CHEERP_BASE_NAME).js, $(BLOG_BUILD_FOLDERS))
-BLOG_CHWASM := $(patsubst %, %$(CHEERP_BASE_NAME).wasm, $(BLOG_BUILD_FOLDERS))
 BLOG_TS := $(patsubst %, %$(TS_BASE_NAME).js, $(BLOG_BUILD_FOLDERS))
 BLOG_MEDIA := $(patsubst %, %media, $(BLOG_BUILD_FOLDERS))
 
@@ -43,11 +42,10 @@ build/blog/%index.html: src/blog/%index.html src/blog/% $(BLOG_TEMPLATE_COMPILER
 	$(PYTHON_3) $(BLOG_TEMPLATE_COMPILER) src/blog/$*
 	
 LIB_FILES = $(shell find $(CHEERP_LIB) -type f -name *.hpp)
-build/blog/%$(CHEERP_BASE_NAME).wasm: src/blog/%$(CHEERP_BASE_NAME).cpp $(LIB_FILES) #build/blog/%
+build/blog/%$(CHEERP_BASE_NAME).js: src/blog/%$(CHEERP_BASE_NAME).cpp $(LIB_FILES) #build/blog/%
 	mkdir -p build/blog/$*
-	$(CHEERP) $(CHEERP_FLAGS) -cheerp-wasm-loader=$(patsubst %.wasm,%.js,$@) -o $@ $<
+	$(CHEERP) $(CHEERP_FLAGS) -o $@ $<
 	
-build/blog/%$(CHEERP_BASE_NAME).js: build/blog/%$(CHEERP_BASE_NAME).wasm
 
 build/blog/%$(TS_BASE_NAME).js: src/blog/%$(TS_BASE_NAME).ts
 	mkdir -p build/blog/$*

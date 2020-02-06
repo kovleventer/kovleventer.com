@@ -24,9 +24,15 @@
 			<label for="dft_colored">Colored</label>
 		</figure>
 		
-		<p>Complex functions are oftben plotted with <a href="https://en.wikipedia.org/wiki/Domain_coloring">domain coloring</a> but this is not the case now. From zero to π, the whole range of hues are covered with a bright saturation. From -π to zero (and π as well since -π is the same as π) the same range is covered buth with a slighlitly lower saturation. As result, points atthe opposite side of the circle will share the same hue and they'll only differ in saturation.<p>
+		<p>Complex functions are oftben plotted with <a href="https://en.wikipedia.org/wiki/Domain_coloring">domain coloring</a> but this is not the case now. From zero to π, the whole range of hues are covered with a bright saturation. From -π to zero (and π as well since -π is the same as π) the same range is covered buth with a slightly lower saturation. As result, points at the opposite side of the circle will share the same hue and they'll only differ in saturation.<p>
 		
+		<figure>
+			<canvas id="coloring_demo"></canvas>
+		</figure>
 		
+		<p>With this way of coloring, you might notice a certain symmetry in the DFT matrices, especially if we make equalize the saturation for all terms and we choose an even sized matrix. Can we exploit this weird symmetry?</p>
+		
+		<img src="media/dft_symmetry.png">
 		
 	</article>
 	<script src="chscript.js"></script>

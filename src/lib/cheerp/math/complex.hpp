@@ -41,7 +41,14 @@ public:
 	}
 	
 	T getArg() {
-		return std::atan2(imag, real);
+		T val = std::atan2(imag, real);
+		if (std::abs(val+M_PI) < 0.001) {
+			val = M_PI;
+		}
+		if (val < 0) {
+			val += 2 * M_PI;
+		}
+		return val;
 	}
 	
 };

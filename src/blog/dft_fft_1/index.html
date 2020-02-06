@@ -206,7 +206,7 @@
 		
 		<img src="media/expo_nyquist_sin.png">
 		
-		<p>This half rate is called the <a href="https://en.wikipedia.org/wiki/Nyquist_frequency">Nyquist frequency</a>, and it is the reason why CDs has a sampling rate of 44100 Hz, while the max frequency audible to human ear is just 20000 Hz. Why this sampling rate is even higher than 40000 Hz will be discussed later.<p>
+		<p>This half rate is called the <a href="https://en.wikipedia.org/wiki/Nyquist_frequency">Nyquist frequency</a>, and it is the reason why CDs have a sampling rate of 44100 Hz, while the max frequency audible to human ear is just 20000 Hz. Why this sampling rate is even higher than 40000 Hz will be discussed later.<p>
 		
 		<h2>Discrete Fourier Transform</h2>
 		
@@ -216,7 +216,7 @@
 			<p>This is a rather unorthodox way to introduce DFT. Most texts I've seen introduced complex signals first which simplified a lot of things. The signals were complex, the amplitudes were complex and the matrix was complex as well with exponential e^(jφ) terms handling all kinds of phases. And since any single term held twice amount of value or information now, the Gaussian elimination worked just as well as before when we only had cosines and real numbers. But this all came at the cost of complex signals don't really exist and finding a real world use case for them would have been really hard. Also I stated in the motivation section, that we are going to analyse real signals, so why would we switch to complex ones suddenly? After the definition, we would have seen, that for the special case of real numbers, the spectrum (range of amlitudes) is <i>coincidentally</i> symmetric, so we can discard half our results, but this way you've seen why: to extract twice as much information from our system (amplitude and phase), we had to supply twice as much data as well.</p>
 		</div>
 		
-		<p>Let's see how such a synthesis matrix looks like for N=4. To get real values as a result, we would have to construct our amplitude vector in a special way to be symmetric, so now we aren't going to use this matrix for synthesis, but to help to construct our analysis matrix.</p>
+		<p>Let's see how such a synthesis matrix looks like for N=5. To get real values as a result, we would have to construct our amplitude vector in a special way to be symmetric, so now we aren't going to use this matrix for synthesis, but to help to construct our analysis matrix.</p>
 		
 		{{ formula("dft_idft_matrix.tex", 24) }}
 		
@@ -256,7 +256,7 @@
 			<img src="media/dft_sumcol4.svg">
 		</div>
 		
-		<p>The rotations always cancel each other out except in the first column, where each rotation is facing rightwards and they amplify each other. What happens if we divide a column with another column elementwise? If they are the same column, the obvious answer is that we get a column full of ones: the same column as our first. Otherwise the resulting column will have the index of the difference of the index of the two operands as seen below, where the top row marks the index.</p>
+		<p>The rotations always cancel each other out except in the first column, where each rotation is facing rightwards and they amplify each other. What happens if we divide a column with another column elementwise? If they are the same column, the obvious answer is that we get a column full of ones: the same column as our first. Otherwise the resulting column will have the index of the difference of the indices of the two operands as seen below, where the top row marks the index.</p>
 		
 		<img src="media/dft_diffcol.svg">
 		
@@ -292,7 +292,7 @@
 		
 		<img src="media/dft_example_symm.png">
 		
-		<p>We can see that the DC term (0 freq.) has no pair, but excluding that, every other frequency bin has one. 0.1 is the same as 0.9, and so on; again, nothing surprising here. To extract the amplitudes properly, we shouldn't discard the last half simply, we should add them to the first, whilst keeping the symmetry. After that the resulting amplitudes in our example are the following:<p>
+		<p>We can see (actually no, but believe me) that the DC term (0 freq.) has no pair, but excluding that, every other frequency bin has one. 0.1 is the same as 0.9, and so on; again, nothing surprising here. To extract the amplitudes properly, we shouldn't discard the last half simply, we should add them to the first, whilst keeping the symmetry. After that the resulting amplitudes in our example are the following:<p>
 		
 		<table>
 			<tr>
@@ -325,9 +325,9 @@
 			</tr>
 		</table>
 		
-		<p>Ignoring rounding errors, we did a good job. The highest frequency component (0.8 with amplitude of 1.4) got degraded into the frequency bin of two as it should have happened. Notice that we also extended the number of samples to 10. The results we would have gotten from 6 bins would have been usable, but they wouldn't have been ideal for demonstrating that our method, the DFT works indeed.</p>
+		<p>Ignoring rounding errors, we did a good job. The highest frequency component (0.8 with amplitude of 1.4) got degraded into the frequency bin of 0.2 as it should have happened. Notice that we also extended the number of samples to 10. The results we would have gotten from 6 bins would have been usable, but they wouldn't have been ideal for demonstrating that our method, the DFT works indeed.</p>
 		
-		<p>Our last graph, where we plotted the amplitudes against the frequency bins is called the <b>spectrum</b>. To be honest I haven't given a formal definition of the DFT yet, which maybe puts the resulting function in perspective. In practice, our signal is comprised of lots of samples, so when plotted, it looks like a continous signal. The same can be said for this spectrum; F(f) is just another discrete signal. Also if you look at definitions from other sources, you'll se that they prefer the usage of sqare brackets whenever dealing with discrete signals, so do I now.</p>
+		<p>Our last graph, where we plotted the amplitudes against the frequency bins is called the <b>spectrum</b>. To be honest I haven't given a formal definition of the DFT yet, which maybe puts the resulting function in perspective. In practice, our signal is comprised of lots of samples, so when plotted, it looks like a continous signal. The same can be said for this spectrum; F(f) is just another discrete but continous looking signal. Also if you look at definitions from other sources, you'll se that they prefer the usage of sqare brackets whenever dealing with discrete signals, so do I now.</p>
 		
 		{{ formula("dft_definition.tex", 24, amsmath=False) }}
 		

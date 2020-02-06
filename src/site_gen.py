@@ -20,7 +20,7 @@ def get_blog_entries():
     entries = []
 
     for entry in dir_entries:
-        config = os.path.join(entry, "config.yaml")
+        config = os.path.join(entry, "config.yml")
         if os.path.exists(config):
             with open(config) as f:
                 cfg = yaml.load(f)
