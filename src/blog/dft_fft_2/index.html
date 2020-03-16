@@ -30,9 +30,69 @@
 			<canvas id="coloring_demo"></canvas>
 		</figure>
 		
-		<p>With this way of coloring, you might notice a certain symmetry in the DFT matrices, especially if we make equalize the saturation for all terms and we choose an even sized matrix. Can we exploit this weird symmetry?</p>
+		<p>With this way of coloring, you might notice some sort of symmetry in the DFT matrices. For example for even cases they are made up from four similarly colored parts. But the symmetry we are going to exploit is a bit more subtle, so we need to cover some elements first.</p>
 		
-		<img src="media/dft_symmetry.png">
+		<p>If we cover or ignore each <a class="hoverbutton" onmouseover="show_even()">even column</a>, the remaining elements will show symmetry vertically, <a class="hoverbutton" onmouseover="show_even_tb()" onmouseout="show_even()"><span class="plt_red">top</span> and <span class="plt_blue">bottom</span></a> is identical which means that the submatrix from the top five rows will be exactly the same as the bottom five rows in this size 10 DFT case.</p>
+		
+		<img id="evenodd" src="media/dft_cover_even.png">
+		
+		<p>Alternatively we can cover each <a class="hoverbutton" onmouseover="show_odd()">odd column</a> as well. In that case the symmetry is a bit weaker, the elements at <a class="hoverbutton" onmouseover="show_odd_tb()" onmouseout="show_odd()"><span class="plt_red">top</span> and <span class="plt_blue">bottom</span></a> will be shown with the opposite color of the colorwheel, bright colors turn into duller ones and vice versa. You might also say that the difference of their angles is π.</p>
+		
+		<p>When we are applying the Discrete Fourier Transform to a signal, we multiply it with the DFT matrix. For this purpose we can <b>split</b> this matrix into two smaller ones. The original multiplication with a size six DFT matrix:</p>
+		
+		<figure>
+			<canvas id="dft_6_1"></canvas>
+		</figure>
+		
+		<p>The amplitude was marked with C, so we could use A and B after splitting (C is the sum of A and B):</p>
+		
+		<figure>
+			<canvas id="dft_6_2"></canvas>
+		</figure>
+		
+		<p>What did we gain from that? Nothing, as matrix multiplication is just regular multiplication and summation, and we could have done this splitting for any matrix we wanted to; the gains come now.</p>
+		
+		<ul>
+			<li><b>Step one</b>: Maybe you are already seeing it, but this is the first important discovery. If we leave out every even column and select the first half of the rows, we get back a DFT matrix with half the original size; in this case from a DFT sized six we get a smaller three sized matrix:</li>
+			
+			<img src="media/split_1.png">
+			
+			<p>This is no coincidence, the <span class="mat_green_700">angles of an even sized DFT matrix</span> are the same as the <span class="mat_red_700">angles of halved size matrix</span>, with some <b>additional angles</b>. Taking only each second element results in You can see this with a DFT sized 10:</p>
+			
+			<img src="media/split_halffreq.png">
+			
+			<li><b>Step two</b>: As we said earlier the submatrix with the evens skipped is exactly symmetric, which means we can paste this 3 sized DFT below the original. This also changes (simplifies) the partial results, <i>A1 = A4</i>, <i>A2 = A5</i> and <i>A3 = A6</i>.</li>
+			
+			<img src="media/split_2.png">
+			
+			<li><b>Step three</b>: Tricky part again, because we have mixed additional and "regular" angles. It would be nice if we could encode the second part into smaller DFT matrices as well, but the angles just look way off.</li>
+			
+			<p>Visually the question is: how do we get from this state <img style="height:80px" class="inline" src="media/smalldft_left.png"> to here <img style="height:80px" class="inline" src="media/smalldft_right.png">? It's easy, <b>shift it right</b>!</p>
+			
+			<p>Take a look at a non-simplified DFT matrix. What operation needs do be done to get from one element to its right neighbor?</p>
+			
+			<img src="media/dft_matrix_5.svg"> <!-- TODO khm khm-->
+			
+			<p>Multiply it with the element in the <span class="plt_red">second column</span> and the same row! Or with the second row and the same column, it is symmetric, so it does not matter for single elements, but we are going to use this for whole columns, so stick with the first method.</p>
+			
+			<img src="media/split_3.png">
+			
+			<p>So the size 3 DFT matrix is multiplied now with some <b>twiddle factors</b> <i>before</i> applied to our signal. This isn't matrix multiplication nor elementwise, since the sizes don't add up. You should multiply each element with the twiddle factor of the same row. It is not hard to prove that associativity still applies here. This way we can apply those twiddle factors <i>after</i> we completed our smaller DFT. Right now 3 out of 4 parts start with applying DFT to a smaller part of the signal.</p>
+			
+			<li><b>Step three and a half</b>: Turns out we can actually generalize this idea through the whole second part:</li>
+			
+			<img src="media/split_35.png">
+			
+			<li><b>Step four</b>: But that's kind of ugly. And we've seen that there is still some sort of symmetry here. Turning a color to its opposite saturation equals to the complex number behind it's additive inverse. And since we can do the DFT part before applying the twiddle factors, we can use the results B1, B2, and B3 to calculate the rest.</li>
+			
+			<img src="media/split_4.png">
+		</ul>
+		
+		<p>How much speed did we gain from all of that? A regular DFT of size 10 does a matrix vector multiplication, which takes a hundred (complex!) multiplications and 90 additions. This brand new method method does two 5 sized DFTs (25*2 multiplications and 20*2 additions) and to combine the partial results, five additions and five substractions (which is computationally the same as addition). We roughly halved our computations.</p>
+		
+		<p>Can we go further? Not really. <i>Could</i> we go further? I deliberately choose size 6 and 10 DFTs as our examples, since they are divisible by two but only once. In case we have a DFT with a size divisible by four, nothing prevents us to do additional speedups and so on. This is called the <b>radix two FFT</b> and as the name suggests this works well with sizes being the powers of 2.<p>
+		
+		<h2>Radix two FFT</h2>
 		
 	</article>
 	<script src="chscript.js"></script>

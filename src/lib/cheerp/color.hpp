@@ -19,6 +19,8 @@ namespace Color {
 	const int MAT_GREEN_50 = 0xf1f8e9;
 	const int MAT_PINK_50 = 0xfce4ec;
 	const int MAT_LBLUE_50 = 0xe1f5fe;
+	const int MAT_YELLOW_50 = 0xfffde7;
+	const int MAT_LIME_50 = 0xf9fbe7;
 	
 	const int MAT_RED_300 = 0xe57373;
 	const int MAT_CYAN_300 = 0x4dd0e1;
@@ -26,6 +28,7 @@ namespace Color {
 	const int MAT_YELLOW_300 = 0xffee58;
 	const int MAT_PINK_300 = 0xf06292;
 	const int MAT_LBLUE_300 = 0x4fc3f7;
+	const int MAT_LIME_300 = 0xdce775;
 	
 	const int MAT_RED_700 = 0xd32f2f;
 	const int MAT_CYAN_700 = 0x0097a7;

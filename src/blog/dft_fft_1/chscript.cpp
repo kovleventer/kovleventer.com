@@ -228,6 +228,7 @@ void renderDFTWRotJS() {
 	Graphics::setLineWidth(dftWRotCanvas, 8);
 	Graphics::drawLine(dftWRotCanvas, w/2, h/2, w/2+std::cos(2*M_PI*value/5)*(r+10), h/2-std::sin(2*M_PI*value/5)*(r+10), Color::MAT_RED_700);
 	Graphics::drawText(dftWRotCanvas, (std::string("f*t*N=") + std::to_string(value)).c_str(), w*3/4, 40, Color::GRAY, "center", "middle", 30);
+	
 }
 
 Scene dftInverse;

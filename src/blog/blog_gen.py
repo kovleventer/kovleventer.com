@@ -49,7 +49,7 @@ def render_tex(filename, fontsize=24, amsmath=True, inline=False):
     plt.close(fig)
 
     svg = svg.split("/")[-1]
-    return '<img class="formula' + ('_inline"' if inline else '"') + ' src="' + svg + '">'
+    return '<img class="formula' + (' inline"' if inline else '"') + ' src="' + svg + '">'
 
 
 config = os.path.join(folder, "config.yml")
