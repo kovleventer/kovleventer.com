@@ -4,6 +4,7 @@
 <head>
 	<title>{{ title }}</title>
 	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<link rel="stylesheet" type="text/css" href="media/highlight.css">
 	<meta charset="UTF-8">
 </head>
 <body>
@@ -84,7 +85,7 @@
 			<li><span class="strong_highlight_6">82</span>: Checksum. Calculated by <a href="https://en.wikipedia.org/wiki/Bitwise_operation#XOR">XOR</a>ing the all bytes in the frame excluding the preamble.</li>
 			
 			<div class="infobox warning">
-				<p>Since XORing two same bits result in zero, and XORing with a zero keeps the value inact, including the preambles in the checksum makes it valid, but only if the number of preamble bytes is even. If this number suddenly changes to and odd one, it may introduce hard to find bugs.</p>
+				<p>Since XORing two same bits result in zero, and XORing with a zero keeps the value inact, including the preambles in the checksum makes it valid, but only if the number of preamble bytes is even. If this number suddenly changes to an odd one, it may introduce hard to find bugs.</p>
 			</div>
 		</ul>
 		
@@ -187,7 +188,7 @@
 		
 		<ul>
 			<li><span class="strong_highlight_7">00</span> <span class="strong_highlight_8">80</span>: Status and error codes work the same way as seen before.</li>
-			<li><span class="strong_highlight_17">41 AE 00 00</span>: Five values were sent back. Each value except the first is preceded by an unit type indicator byte (<span class="strong_highlight_16">24</span>, <span class="strong_highlight_16">20</span>), and you should read the concrete unit type from a table similar to the manufacturer one. The first value tells us the current, the second is the primary variable which is always sent. Secondary, tertiary and quaternary variables belong to different miscellaneous sensors. Sometimes they contain valid data, sometimes only something constant invalid value is sent, and sometimes they don't even get sent at all, in this case the response is shorter.</li>
+			<li><span class="strong_highlight_17">41 AE 00 00</span>: Five values were sent back. Each value except the first is preceded by an unit type indicator byte (<span class="strong_highlight_16">24</span>, <span class="strong_highlight_16">20</span>), and you should read the concrete unit type from a table similar to the manufacturer one. The first value tells us the current, the second is the primary variable which is always sent. Secondary, tertiary and quaternary variables belong to different miscellaneous sensors. Sometimes they contain valid data, sometimes only some constant invalid value is sent, and sometimes they don't even get sent at all, in this case the response is shorter.</li>
 			
 			<table class="pc75">
 				<tr>
