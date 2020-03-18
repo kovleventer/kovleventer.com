@@ -32,7 +32,7 @@
 		<p>There are also two things worth mentioning about the <span class="plt_blue">blue signal</span>:</p>
 		
 		<ul>
-			<li>The time scale is completely arbitrary. There is no real meaning behind t=0, so we can shift the whole signal left by 0.4. When we are dealing with only one signal, there is no reason not fix its start point at zero time as leaving the offset at 0.4 would only make our calculations more complicated.</li>
+			<li>The time scale is completely arbitrary. There is no real meaning behind t=0, so we can shift the whole signal left by 0.4. When we are dealing with only one signal, there is no reason not to fix its start point at zero time as leaving the offset at 0.4 would only make our calculations more complicated.</li>
 			<li>Samples are taken periodically at a fixed rate. That might <a href="https://en.wikipedia.org/wiki/Non-uniform_discrete_Fourier_transform">not always</a> be the case, but still is most of the time so using this simplification should be fine for now. As said above, the time scale is arbitrary, so we can rescale the whole signal to have its samples taken at positive (and zero) integer time values. Of course you are probably dealing with physical quantities, so the time scale <i>is</i> important and should not be completely discarded, but more on that later.</li>
 		</ul>
 		

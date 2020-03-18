@@ -36,7 +36,7 @@
 		
 		<img id="evenodd" src="media/dft_cover_even.png">
 		
-		<p>Alternatively we can cover each <a class="hoverbutton" onmouseover="show_odd()">odd column</a> as well. In that case the symmetry is a bit weaker, the elements at <a class="hoverbutton" onmouseover="show_odd_tb()" onmouseout="show_odd()"><span class="plt_red">top</span> and <span class="plt_blue">bottom</span></a> will be shown with the opposite color of the colorwheel, bright colors turn into duller ones and vice versa. You might also say that the difference of their angles is π.</p>
+		<p>Alternatively we can cover each <a class="hoverbutton" onmouseover="show_odd()">odd column</a> as well. In that case the symmetry is a bit weaker, the elements at <a class="hoverbutton" onmouseover="show_odd_tb()" onmouseout="show_odd()"><span class="plt_red">top</span> and <span class="plt_blue">bottom</span></a> will be shown with the opposite color of the colorwheel, bright colors turn into dull ones and vice versa. You might also say that the difference of their angles is π.</p>
 		
 		<p>When we are applying the Discrete Fourier Transform to a signal, we multiply it with the DFT matrix. For this purpose we can <b>split</b> this matrix into two smaller ones. The original multiplication with a size six DFT matrix:</p>
 		
@@ -57,11 +57,11 @@
 			
 			<img src="media/split_1.png">
 			
-			<p>This is no coincidence, the <span class="mat_green_700">angles of an even sized DFT matrix</span> are the same as the <span class="mat_red_700">angles of halved size matrix</span>, with some <b>additional angles</b>. Taking only each second element results in You can see this with a DFT sized 10:</p>
+			<p>This is no coincidence, the <span class="mat_green_700">angles of an even sized DFT matrix</span> are the same as the <span class="mat_red_700">angles of halved size matrix</span>, with some <b>additional angles</b>. Taking only each second element results in frequencies which skip the odd angles. You can see this with a DFT sized 10: As a side note even and odd were used pretty vaguely here, when we covered odd columns, we covered the first, third.. and so on where first meant literally the leftmost column. To be more precise, I should have referred to that column as the zeroth, and so the oddity would swap; but I found this unnatural and counterintuitive.</p>
 			
 			<img src="media/split_halffreq.png">
 			
-			<li><b>Step two</b>: As we said earlier the submatrix with the evens skipped is exactly symmetric, which means we can paste this 3 sized DFT below the original. This also changes (simplifies) the partial results, <i>A1 = A4</i>, <i>A2 = A5</i> and <i>A3 = A6</i>.</li>
+			<li><b>Step two</b>: As we said earlier the submatrix with the evens skipped is exactly symmetric, which means we can paste this same 3 sized DFT below the original. This also changes (simplifies) the partial results, <i>A1 = A4</i>, <i>A2 = A5</i> and <i>A3 = A6</i>.</li>
 			
 			<img src="media/split_2.png">
 			
@@ -77,7 +77,7 @@
 			
 			<img src="media/split_3.png">
 			
-			<p>So the size 3 DFT matrix is multiplied now with some <b>twiddle factors</b> <i>before</i> applied to our signal. This isn't matrix multiplication nor elementwise, since the sizes don't add up. You should multiply each element with the twiddle factor of the same row. It is not hard to prove that associativity still applies here. This way we can apply those twiddle factors <i>after</i> we completed our smaller DFT. Right now 3 out of 4 parts start with applying DFT to a smaller part of the signal.</p>
+			<p>So the size 3 DFT matrix is multiplied now with some <a href="https://en.wikipedia.org/wiki/Twiddle_factor">twiddle factors</a> <i>before</i> applied to our signal. This isn't matrix multiplication nor elementwise, since the sizes don't add up. You should multiply each element with the twiddle factor in the same row. It is not hard to prove that associativity still applies here so we can switch our order of operations. That way we can apply those twiddle factors <i>after</i> we completed our smaller DFT and so right now 3 out of 4 parts start with applying DFT to a smaller part of the signal.</p>
 			
 			<li><b>Step three and a half</b>: Turns out we can actually generalize this idea through the whole second part:</li>
 			
@@ -90,9 +90,64 @@
 		
 		<p>How much speed did we gain from all of that? A regular DFT of size 10 does a matrix vector multiplication, which takes a hundred (complex!) multiplications and 90 additions. This brand new method method does two 5 sized DFTs (25*2 multiplications and 20*2 additions) and to combine the partial results, five additions and five substractions (which is computationally the same as addition). We roughly halved our computations.</p>
 		
-		<p>Can we go further? Not really. <i>Could</i> we go further? I deliberately choose size 6 and 10 DFTs as our examples, since they are divisible by two but only once. In case we have a DFT with a size divisible by four, nothing prevents us to do additional speedups and so on. This is called the <b>radix two FFT</b> and as the name suggests this works well with sizes being the powers of 2.<p>
+		<p>Can we go further? Not really. <i>Could</i> we go further? I deliberately choose size 6 and 10 DFTs as our examples, since they are divisible by two but only once. In case we have a DFT with a size divisible by four, nothing prevents us to do additional speedups and so on with 8 or 16. This is called the <b>radix two FFT</b> and as the name suggests this works well with sizes being the powers of 2.<p>
 		
 		<h2>Radix two FFT</h2>
+		
+		<p>So we finally reached the Fast Fourier Transform. On a more complex example with more than one speedup possibility this is how it looks like (FFT 8):</p>
+		
+		<img src="media/butterfly_vector.png">
+		
+		<p>The colors indicate the various DFTs shown earlier. This structure is called the <a href="https://en.wikipedia.org/wiki/Butterfly_diagram">butterfly diagram</a> due to the resemblance of these X-like structures to butterflies. There are two things worth mentioning here.</p>
+		
+		<ol>
+			<li>The colored lines represents vectors, except the leftmost column. If you ever saw a butterfly diagram for an 8 sized FFT, you probably noticed that there were way more crossing lines for that. We can extract our vectors into regular lines, but in my opinion this does not look much cleaner.</li>
+			
+			<li>The input is scrambled at the beginning. At the first (or last depending on your viewpoint; the one where we combinef two 4 FFTs into one 8 sized) operation, we splitted our input data into odd and even parts. And again at which point we had groups with 4k, 4k+2, 4k+1 and 4k+3 numbers. Not a nice order, but what is worse, at the end, we have our input completely scrambled, seemingly without any sort of structure.</li>
+		</ol>
+		
+		<img src="media/butterfly_dit.svg">
+		
+		<p>This is the butterfly diagram if we expand all vectors. Now we have do decide how to deal with this unnatural order of inputs.</p>
+		
+		<ol>
+			<li>We don't care. If we do an out of place algorithm, which means we don't want our output <a href="https://en.wikipedia.org/wiki/In-place_algorithm">overwrite the input</a>, then we can just allocate a new buffer for the frequency components and then access our input in whatever manner we want.</li>
+			<li>But sometimes we are constrained by limited memory, and having an algorithm which can perform in place is always a good thing. We can find some efficient way to scramble our input before applying the FFT itself.</li>
+			<li>Lastly, we can leave our input unscrambled, but use an in place algorithm, in which case, the output will be scrambled. Maybe it's not a problem for you. This is called <b>decimation in frequency</b> whereas the earlier method was named <b>decimation in time</b>.</li>
+		</ol>
+		
+		<p>The third option is the easiest, you can see the difference on the butterfly diagram.</p>
+		
+		<img src="media/butterfly_dif.svg">
+		
+		<p>This scrambling is a permutation and we could use some <a href="https://en.wikipedia.org/wiki/Permutation_matrix">permutation matrix</a>, but this would be a terrible idea. We worked so hard so far to eliminate the use of matrix multiplication, then this close to the end, we introduce a new one... no. Turns out, this permutation is not random, it is actually the <b>bit reversed order</b> of the indices. This might come as a surprise, but take a deeper look and see how each bit corresponds in terms of odds and evens.</p>
+		
+		<table>
+			<tr>
+				<th>Number</th>
+				<th>Bits</th>
+				<th>Rev. bits</th>
+				<th>New value</th>
+			</tr>
+			<tr><td>0</td><td>000</td><td>000</td><td>0</td></tr>
+			<tr><td>1</td><td>001</td><td>100</td><td>4</td></tr>
+			<tr><td>2</td><td>010</td><td>010</td><td>2</td></tr>
+			<tr><td>3</td><td>011</td><td>110</td><td>6</td></tr>
+			<tr><td>4</td><td>100</td><td>001</td><td>1</td></tr>
+			<tr><td>5</td><td>101</td><td>101</td><td>5</td></tr>
+			<tr><td>6</td><td>110</td><td>011</td><td>3</td></tr>
+			<tr><td>7</td><td>111</td><td>111</td><td>7</td></tr>
+		</table>
+		
+		<p>How can we apply this? FFT is a widely used algorithm, and many solutions were developed over time, ranging form naïve bit reversal to <a href="http://www-graphics.stanford.edu/%7Eseander/bithacks.html#ReverseByteWith64Bits">bitwise hacks</a>, reading from predefined tables or even <a href="https://ieeexplore.ieee.org/document/1299102">memory which can be addressed by bit reversed order adresses as well</a>. In most applications the size of the input and output is a fixed constant, and a lot of these techniques depend on this (for example the single byte bit reverse order only works with FFTs of size 256).</p>
+		
+		<p>So here is an example code in C to demonstrate all of this in of place. This snippet uses the built in <a href="https://en.cppreference.com/w/c/numeric/complex">complex numbers</a> of C. Also note how the actual FFT code (in <i>fft_req()</i>) is only like 8-10 lines, and the rest is reordering the input in bit reversed order. You may find more examples on this at <a href="https://rosettacode.org/wiki/Fast_Fourier_transform">rosettacode.org</a></p>
+		
+		{{ code("fft_rad2.c", "c") }}
+		
+		<p>This algorithm uses divide and conquer approach in a recursive manner. If you are familiar with sorting algorithms, this technique is probably familiar for you. Both quicksort and FFT halves the array and traces back the problem to two smaller ones. They share similarity in complexity as well, FFT is an <b>O(nlogn)</b> operation, where log indicates logarithm with base 2. That means our original problem with 44100 samples can be solved in (roughly) <b>680 396</b> steps. Well, thats feasible... or would be, only if 44100 happened to be a power of 2, which sadly isn't.</p>
+		
+		<h2>The Cooley-Tukey FFT</h2>
 		
 	</article>
 	<script src="chscript.js"></script>
