@@ -13,7 +13,7 @@ void fft_req(double complex array[], int n) {
 	}
 }
 
-void fft(double complex array[], int n) {
+void fft(double complex array[], int n) { // n is the length of the array
 	// Naive bit reversal permutation
 	for(int i = 0; i < n; i++) {
 		int rev_i = i; // i, but with its bits reversed

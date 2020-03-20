@@ -19,7 +19,7 @@
 		
 		<figure>
 			<canvas id="dft_matrices"></canvas>
-			<input type="range" id="dft_size" min="1" max="10" value="3">
+			<input type="range" id="dft_size" min="1" max="15" value="3">
 			<input type="checkbox" id="dft_colored">
 			<label for="dft_colored">Colored</label>
 		</figure>
@@ -141,13 +141,19 @@
 		
 		<p>How can we apply this? FFT is a widely used algorithm, and many solutions were developed over time, ranging form naïve bit reversal to <a href="http://www-graphics.stanford.edu/%7Eseander/bithacks.html#ReverseByteWith64Bits">bitwise hacks</a>, reading from predefined tables or even <a href="https://ieeexplore.ieee.org/document/1299102">memory which can be addressed by bit reversed order adresses as well</a>. In most applications the size of the input and output is a fixed constant, and a lot of these techniques depend on this (for example the single byte bit reverse order only works with FFTs of size 256).</p>
 		
-		<p>So here is an example code in C to demonstrate all of this in of place. This snippet uses the built in <a href="https://en.cppreference.com/w/c/numeric/complex">complex numbers</a> of C. Also note how the actual FFT code (in <i>fft_req()</i>) is only like 8-10 lines, and the rest is reordering the input in bit reversed order. You may find more examples on this at <a href="https://rosettacode.org/wiki/Fast_Fourier_transform">rosettacode.org</a></p>
+		<p>So here is an example code in C to demonstrate all of this in of place. This snippet uses the built in <a href="https://en.cppreference.com/w/c/numeric/complex">complex numbers</a> of C. Also note how the actual FFT code (in <i>fft_req()</i>) is only like 10-12 lines, and the rest is reordering the input in bit reversed order. You may find more examples on this at <a href="https://rosettacode.org/wiki/Fast_Fourier_transform">rosettacode.org</a>.</p>
 		
 		{{ code("fft_rad2.c", "c") }}
 		
 		<p>This algorithm uses divide and conquer approach in a recursive manner. If you are familiar with sorting algorithms, this technique is probably familiar for you. Both quicksort and FFT halves the array and traces back the problem to two smaller ones. They share similarity in complexity as well, FFT is an <b>O(nlogn)</b> operation, where log indicates logarithm with base 2. That means our original problem with 44100 samples can be solved in (roughly) <b>680 396</b> steps. Well, thats feasible... or would be, only if 44100 happened to be a power of 2, which sadly isn't.</p>
 		
 		<h2>The Cooley-Tukey FFT</h2>
+		
+		<p>The question now is <b>how can we accelerate the Discrete Fourier Transform for sizes that are not powers of two?</b>. Add a point to <a class="hoverbutton" onmouseover="add_left()" onmouseout="add_nothing()">the left</a> or to <a class="hoverbutton" onmouseover="add_right()" onmouseout="add_nothing()">the right</a>.</p>
+		
+		<figure>
+			<canvas id="fft_padding"></canvas>
+		</figure>
 		
 	</article>
 	<script src="chscript.js"></script>

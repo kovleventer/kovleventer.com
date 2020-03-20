@@ -5,6 +5,7 @@
 #include "coloring_demo.hpp"
 #include "dft_6_1.hpp"
 #include "dft_6_2.hpp"
+#include "fft_padding.hpp"
 
 extern "C" [[cheerp::jsexport]]
 void show_even() {
@@ -35,4 +36,5 @@ void webMain() {
 	coloring_demo::init();
 	dft_6_1::init();
 	dft_6_2::init();
+	fft_padding::init();
 }
