@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iomanip>
 
-#define MAX_MATRIX_SIZE 15
+#define MAX_MATRIX_SIZE 10
 using CFMatrix = VMatrix<Complex<float>>;
 
 std::vector<CFMatrix> dftMatrices;

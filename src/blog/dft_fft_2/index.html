@@ -19,7 +19,7 @@
 		
 		<figure>
 			<canvas id="dft_matrices"></canvas>
-			<input type="range" id="dft_size" min="1" max="15" value="3">
+			<input type="range" id="dft_size" min="1" max="10" value="3">
 			<input type="checkbox" id="dft_colored">
 			<label for="dft_colored">Colored</label>
 		</figure>
@@ -202,11 +202,61 @@
 		
 		<h2>Miscellaneous topics</p>
 		
-		<h3>ifft<h3>
+		<h3>ifft</h3>
+		
+		<p>With regular DFTs applying the inverse transformation was as easy as the forward: a matrix multiplication. With these accelerations, can we do inverse FFT in O(nlogn) time? The answer is simple, yes, only the twiddle factors need to be modified. In the radix 2 case this is as simple as changing this line from this:</p>
+		
+		{{ code("forward_twiddle.c", "c") }}
+		
+		<p>to this (no minus sign):</p>
+		
+		{{ code("inverse_twiddle.c", "c") }}
+		
+		<p>Also since we said in the last part that we haven't done any normalization in the regular transform part, we have to do it now. <b>So divide the result with the length of the samples!</b></p>
 		
 		<h3>A concrete example</h3>
 		
+		<p>You saw that all the Discrete Fourier Transform is to transform an input array into an output array. What if you have a sound file, and you want to work with its spectrum? If the wav file has 56000 samples and a sample rate of 8000, what frequency will the output array's 18457th element correspond to?</p>
+		
+		<p>Pretty simple actually. If the sample rate was 1, it would be <i>18456 / 56000 = 0.330 Hz</i>, also note how I substraced one from 18457, because the indexing starts from zero. If the sample rate is higher, then our measured frequencies will be higher as well, so the final answer is <i>18456 / 56000 * 8000 = 2637 Hz</i>.</p>
+		
+		<p>For a python example, let's suppose you have a wav file:</p>
+		
+		<figure>
+			<audio controls>
+				<source src="media/321232__night-soundscapes__horror-train-effect.wav">
+			</audio>
+			<p class="disclaimer">From freesounds.org; made by night_soundscapes; licensed under CC BY-NC 3.0. <a href="https://freesound.org/people/night_soundscapes/sounds/321232/">source</a></p>
+		</figure>
+		
+		<p>And the full code example below. We can use the <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftfreq.html">fftfreq()</a> method of numpy to generate all frequencies, even the repeated ones and <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html">rfftfreq()</a> to also do this, but discard the later half.</p>
+		
+		{{ code("rfftfreq.py") }}
+		
+		<p>And the plotted spectrum:</p>
+		
+		<img src="media/rfftfreq.png">
+		
 		<h3>Relation to regular Fourier transforms</h3>
+		
+		<p>In the very beginning of the first part I said that this article is an introduction for those who have no knowledge of regular Fourier transforsm, but chances are high that you have already seen one, or at least the definition of it (with maybe a slightly different notation).<p>
+		
+		{{ formula("fourier.tex", amsmath=False) }}
+		
+		<p>Some parts seem familiar, for example the exponential part, while I haven't ever mentioned integrals yet. What happens if we expand our DFT matrix to infinity? Note that this is not a precise operation and the only purpose of this is visual intuition.</p>
+		
+		<img src="media/dft_dtft_fs_ft.svg" style="max-height: 900px">
+		
+		<p>As you can see we could increase our original DFT matrix in two dimension: one resulted in the <a href="https://en.wikipedia.org/wiki/Discrete-time_Fourier_transform">Discrete-time Fourier Transform</a>, while with the other we got the coefficents of the <a href="https://en.wikipedia.org/wiki/Fourier_series">Fourier series</a>, and when we combined them, we finally got the <a href="https://en.wikipedia.org/wiki/Fourier_transform">Fourier transform</a>. Intuitively the summations turned into integrals, but there are lots of unexplained remarks here. How do we strech a matrix to infinity? From 0 to ∞? From -∞ to ∞? Between two given numbers but with infinite granuality? Also these concepts have deeper connections between them, like periodicity, which we haven't talked about, so the image above should only serve as a visual intuitive helper.</p>
+		
+		<h2>Sources</h2>
+		
+		<ol>
+			<li>Allen B. Downey: Think DSP; Green Tea Press (<a href="https://greenteapress.com/wp/think-dsp/">link</a>)</li>
+			<li>Ronald N. Bracewell: The Fourier Transform and its Applications third edition</li>
+			<li><a href="https://www.katjaas.nl/home/home.html">katjaas.nl</a></li>
+			<li><a href="https://www.youtube.com/playlist?list=PLuh62Q4Sv7BUSzx5Jr8Wrxxn-U10qG1et">ECSE-4530 Lectures by Rich Radke</a></li>
+		</ol>
 		
 	</article>
 	<script src="chscript.js"></script>
