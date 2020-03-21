@@ -149,11 +149,64 @@
 		
 		<h2>The Cooley-Tukey FFT</h2>
 		
-		<p>The question now is <b>how can we accelerate the Discrete Fourier Transform for sizes that are not powers of two?</b>. Add a point to <a class="hoverbutton" onmouseover="add_left()" onmouseout="add_nothing()">the left</a> or to <a class="hoverbutton" onmouseover="add_right()" onmouseout="add_nothing()">the right</a>.</p>
+		<p>The question now is <b>how can we accelerate the Discrete Fourier Transform for sizes that are not powers of two?</b>. The most trivial answer is to pad it: add a point to <a class="hoverbutton" onmouseover="add_left()" onmouseout="add_nothing()">the left</a> or to <a class="hoverbutton" onmouseover="add_right()" onmouseout="add_nothing()">the right</a> of a 7 length sequence. As you can see the interpolated function - the one that we obtained from the Fourier coefficients - doesn't really change much. Also not because of the periodictity, we get the same coefficients regardless if we add the padding zero to the beginning or the end.</p>
 		
 		<figure>
 			<canvas id="fft_padding"></canvas>
 		</figure>
+		
+		<p>Of course, that's not a complete and perfect solution. For seven points, it is good enough, bit for nine? Should we use seven padding zero points? Or discard one? if we could split our even data into two parts, why can't we use the same principles and divide the samples by three or five or seven? Well the <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">algorithm</a> named after James Cooley and John Tukey does exactly this. Actually the radix 2 method is just a special case of this, but the most popular; if you look up the Cooley-Tukey algorithm on the internet, you will find dozens of these butterfly diagrams shown earlier.</p>
+		
+		<p>The product of the two smallest primes, which are not two is 15, so we are going to use this size as our example. As you can see below, the DFT matrix of that size, is getting pretty large - no trivial symmetries in sight but the coloring resembles some kind of structure. To construct an efficient algorithm, we are going to do the same four steps as with the radix 2 case.</p>
+		
+		<img src="media/dft_15.png">
+		
+		<ul>
+			<li><b>Step zero</b>: splitting. Before we made those simplifications to the radix two case, we shown that we could split our matrix and samples into even and odd parts. We can do the same just with 3K, 3K+1 and 3K+2. Or maybe with 5K, 5K+1, 5K+2, 5K+3, 5K+4. There is no particular reason to pick one over the other, so for now I'll use the 5K one now.</li>
+			
+			<img src="media/fft15_5split.svg">
+			
+			<p>Now we can group the columns of the matrices and the samples by their respective color:</p>
+			
+			<img src="media/fft15_5sum.svg">
+			
+			<li><b>Step one</b>: finding a small DFT in the top left corner. Yes, if you take a look at the size 15 DFT matrix and then the size 3 one, you can see that it fits. If it is still not clear why, you can check the coefficients in the red columns: 0/15, 5/15, 10/15, or in other words: 0/3, 1/3 and 2/3.</li>
+			
+			<img src="media/fft15_5sum_1dft.svg">
+			
+			<li><b>Step two</b>: the rest of the remaining red submatrix can be also filled with DFTs as well. The reason behind that will be clearer once we reach step 3.5.</li>
+			
+			<img src="media/fft15_5sum_5dft.svg">
+			
+			<li><b>Step three</b>: We can continue filling the rest of the columns with DFTs. Also don't forget to add twiddle factors now for orange: 1/15, 2/15, 3/15 and so on, for yellow 2/15, 4/15, 6/15.</li>
+			<li><b>Step three and a half</b>: With all the DFTs filled we can see the whole picture. Each color has its own twiddle factors (the red columns have 0/15 as twiddle factors which does not change anything). And we can finally see how we can gain computational speed: instead of doing a full 15 by 15 matrix multiplication (225 operations), or 25 times 3 by 3 DFTs, which is 225 operations as well, we only have to do one 3 by 3 DFT per each color, then get the rest of these values via twiddle factors. Finally all is left is a simple summation.</li>
+			
+			<img src="media/fft15_5sum_25dft.svg">
+			
+			<li><b>Step four</b>: there is no step four. On the radix 2 case we could made additional speedups by substraction, but that is impossible with odd cases; for any angle, there is no valid counterpart which is exactly π radians (half a circle) away.</li>
+		</ul>
+		
+		<p>One thing remains now from understanding the whole Cooley-Tukey algorithm. It is only a matter of notation, no speedups can be gained from this, but we can apply the twiddle factors in a more sofisticated manner: in the form of 5 by 5 DFTs. After doing all the DFT3s in the previous image but before applying the twiddle factors, our columns look like this:</p>
+		
+		<img src="media/fft15_5_afterdft3.svg">
+		
+		<p>We can make the following observation: If we take each third line from the beginning (in natural order, the first, fourth, seventh, tenth and thirteenth) and look at their corresponding twiddle factors, they form a perfect 5 by 5 DFT matrix. We can generalize this further for rows 3K+1 and 3K+2 with further twiddle factors. The twiddle factors of the twiddle factors...</p>
+		
+		<img src="media/fft15_5_afterdft3_dft5.svg">
+		
+		<p>So we did DFT3s 5 times and DFT5s 3 times. Even if we used a different splitting at the beginning (3 instead of 5) we would have got the same results. In the general case this algorithm requires the <b>prime factorization</b> of the number, for example for a 60 sized sample, we would do splits of 2, 2, 3 and 5 (in any order).</p>
+		
+		<h2>Summary</h2>
+		
+		<p>We covered discrete and fast Fourier transforms and the most basic algorithms, but there is still room to improve. Depending on your use case, you can take a look into how these algorithms work on special sizes, how they affect and use cache optimally without misses, how to reduce the number of required multiplactions further, how to implement in this in a hardware with high efficiency, how to run them in a highly parallelised environment and so on. For now, only a few not strictly related miscellaneous topics are remaining.</p>
+		
+		<h2>Miscellaneous topics</p>
+		
+		<h3>ifft<h3>
+		
+		<h3>A concrete example</h3>
+		
+		<h3>Relation to regular Fourier transforms</h3>
 		
 	</article>
 	<script src="chscript.js"></script>

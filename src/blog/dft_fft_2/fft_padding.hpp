@@ -99,7 +99,7 @@ void renderForeground() {
 	
 	for (int x = 0; x < w; x++) {
 		double x_ = (double)x / w*10 - (state == POINTS_8_LEFT ? 1 : 2);
-		double x_1 = (double)(x+1) / w*10 - (state == POINTS_8_LEFT ? 1 : 2);
+		double x_1 = (double)(x+2) / w*10 - (state == POINTS_8_LEFT ? 1 : 2);
 		double y = 0, y_1 = 0;
 		for (int i = 0; i < dft_coeffs.size(); i++) {
 			y += dft_coeffs[i].real() * std::cos(2 * M_PI * i * x_ / dft_coeffs.size())
@@ -108,7 +108,7 @@ void renderForeground() {
 					- dft_coeffs[i].imag() * std::sin(2 * M_PI * i * x_1 / dft_coeffs.size());
 		}
 		
-		foreground.drawLine(x, -(y / dft_coeffs.size())+zeroLevel, x+1, -(y_1 / dft_coeffs.size())+zeroLevel, Color::RED);
+		foreground.drawLine(x, -(y / dft_coeffs.size())+zeroLevel, x+2, -(y_1 / dft_coeffs.size())+zeroLevel, Color::RED);
 	}
 	
 	if (state == POINTS_8_LEFT) {
