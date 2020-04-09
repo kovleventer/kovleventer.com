@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p>Run length encoding is the simplest form of compression, in fact it's so simple that doesn't even need proper introduction. We can avoid discussing what kind of data we want to compress and we don't have to introduce new concepts like entropy. If you ask a layman how compression works, his answer will probably be some sort of RLE method.</p>
+		
+		<h2>RLE</h2>
+		
+		<p>Let's jump right into it. We can replace any repeating occurances of a letter with its repeat count, which means instead of lots of repeating characters, we'll have only two: the character itself and the count. For example this:</p>
+		
+		{{ formula("compress_before.tex") }}
+		
+		<p>turns into that:</p>
+		
+		{{ formula("compress_after.tex") }}
+		
+		<p>You can see it in action below. Can you break it?</p>
+		
+		<figure>
+			<textarea id="basic_compress_input" rows="4" cols="30" oninput="b_compress()">ABCCCCDEE</textarea>
+			<p>Compressed text:</p>
+			<b><p id="basic_compress_compressed">asdasd</p></b>
+			<p>Decompressed back:</p>
+			<b><p id="basic_compress_decompressed"></p></b>
+			<p id="basic_compress_nomatch" style="display: none"><b><span class="plt_red">Oh no you broke it!</span></b></p>
+		</figure>
+		
+	</article>
+	<script src="tscript.js"></script>
+</body>
+</html>

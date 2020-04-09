@@ -10,6 +10,7 @@ CHEERP_BASE_NAME := chscript
 TS_BASE_NAME := tscript
 
 CHEERP_FLAGS := -target cheerp -O2 -I$(CHEERP_LIB)
+TSC_FLAGS := --target es6
 
 BLOG_ENTRIES := $(shell find src/blog -type f -name config.yml)
 BLOG_FOLDERS := $(patsubst %config.yml, %, $(BLOG_ENTRIES))
@@ -49,7 +50,7 @@ build/blog/%$(CHEERP_BASE_NAME).js: src/blog/%$(CHEERP_BASE_NAME).cpp $(LIB_FILE
 
 build/blog/%$(TS_BASE_NAME).js: src/blog/%$(TS_BASE_NAME).ts
 	mkdir -p build/blog/$*
-	$(TSC) --outFile $@ $<
+	$(TSC) $(TSC_FLAGS) --outFile $@ $<
 	
 build/blog/%media: src/blog/%media
 	mkdir -p build/blog/$*

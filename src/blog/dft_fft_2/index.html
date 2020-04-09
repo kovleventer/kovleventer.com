@@ -11,7 +11,7 @@
 	<article>
 		<h1>{{ title }}</h1>
 		
-		<p>In the <a href="/blog/dft_fft_1">previous part</a>, we showed how we could build signals from sinusoids, and how to analyse built signals to get their components back. Inverting the matrix using Gaussian elimination showed to be really slow bu we could accelerate that using the easily invertible DFT matrix. Much faster, right? Multiplying an <i>n</i> by </i>n</i> matrix with an <i>n</i> long vector is an O(n^2) operation. With a 1 second long signal and a sample rate of 44100 Hz, that still means <b>1 944 810 000</b>, almost two billion steps.</p>
+		<p>In the <a href="/blog/dft_fft_1">previous part</a>, we showed how we could build signals from sinusoids, and how to analyse built signals to get their components back. Inverting the matrix using Gaussian elimination showed to be really slow but we could accelerate that using the easily invertible DFT matrix. Much faster, right? Multiplying an <i>n</i> by </i>n</i> matrix with an <i>n</i> long vector is an O(n^2) operation. With a 1 second long signal and a sample rate of 44100 Hz, that still means <b>1 944 810 000</b>, almost two billion steps.</p>
 		
 		<h2>Going faster</h2>
 		
@@ -103,7 +103,7 @@
 		<ol>
 			<li>The colored lines represents vectors, except the leftmost column. If you ever saw a butterfly diagram for an 8 sized FFT, you probably noticed that there were way more crossing lines for that. We can extract our vectors into regular lines, but in my opinion this does not look much cleaner.</li>
 			
-			<li>The input is scrambled at the beginning. At the first (or last depending on your viewpoint; the one where we combinef two 4 FFTs into one 8 sized) operation, we splitted our input data into odd and even parts. And again at which point we had groups with 4k, 4k+2, 4k+1 and 4k+3 numbers. Not a nice order, but what is worse, at the end, we have our input completely scrambled, seemingly without any sort of structure.</li>
+			<li>The input is scrambled at the beginning. At the first (or last depending on your viewpoint; the one where we combined two 4 FFTs into one 8 sized) operation, we splitted our input data into odd and even parts. And again at which point we had groups with 4k, 4k+2, 4k+1 and 4k+3 numbers. Not a nice order, but what is worse, at the end, we have our input completely scrambled, seemingly without any sort of structure: 0, 4, 2, 6, 1, 5, 3, 7.</li>
 		</ol>
 		
 		<img src="media/butterfly_dit.svg">
@@ -149,13 +149,13 @@
 		
 		<h2>The Cooley-Tukey FFT</h2>
 		
-		<p>The question now is <b>how can we accelerate the Discrete Fourier Transform for sizes that are not powers of two?</b>. The most trivial answer is to pad it: add a point to <a class="hoverbutton" onmouseover="add_left()" onmouseout="add_nothing()">the left</a> or to <a class="hoverbutton" onmouseover="add_right()" onmouseout="add_nothing()">the right</a> of a 7 length sequence. As you can see the interpolated function - the one that we obtained from the Fourier coefficients - doesn't really change much. Also not because of the periodictity, we get the same coefficients regardless if we add the padding zero to the beginning or the end.</p>
+		<p>The question now is <b>how can we accelerate the Discrete Fourier Transform for sizes that are not powers of two?</b>. The most trivial answer is to pad it: add a point to <a class="hoverbutton" onmouseover="add_left()" onmouseout="add_nothing()">the left</a> or to <a class="hoverbutton" onmouseover="add_right()" onmouseout="add_nothing()">the right</a> of a 7 length sequence. As you can see the interpolated function - the one that we obtained from the Fourier coefficients - doesn't really change much. Also note because of the periodictity, we get the same coefficients regardless if we add the padding zero to the beginning or the end.</p>
 		
 		<figure>
 			<canvas id="fft_padding"></canvas>
 		</figure>
 		
-		<p>Of course, that's not a complete and perfect solution. For seven points, it is good enough, bit for nine? Should we use seven padding zero points? Or discard one? if we could split our even data into two parts, why can't we use the same principles and divide the samples by three or five or seven? Well the <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">algorithm</a> named after James Cooley and John Tukey does exactly this. Actually the radix 2 method is just a special case of this, but the most popular; if you look up the Cooley-Tukey algorithm on the internet, you will find dozens of these butterfly diagrams shown earlier.</p>
+		<p>Of course, that's not a complete and perfect solution. For seven points, it is good enough, bit for nine? Should we use seven padding zero points? Or discard one? If we could split our even data into two parts, why can't we use the same principles and divide the samples by three or five or seven? Well the <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">algorithm</a> named after James Cooley and John Tukey does exactly this. Actually the radix 2 method is just a special case of that, but the most popular; if you look up the Cooley-Tukey algorithm on the internet, you will find dozens of these butterfly diagrams shown earlier.</p>
 		
 		<p>The product of the two smallest primes, which are not two is 15, so we are going to use this size as our example. As you can see below, the DFT matrix of that size, is getting pretty large - no trivial symmetries in sight but the coloring resembles some kind of structure. To construct an efficient algorithm, we are going to do the same four steps as with the radix 2 case.</p>
 		
@@ -190,7 +190,7 @@
 		
 		<img src="media/fft15_5_afterdft3.svg">
 		
-		<p>We can make the following observation: If we take each third line from the beginning (in natural order, the first, fourth, seventh, tenth and thirteenth) and look at their corresponding twiddle factors, they form a perfect 5 by 5 DFT matrix. We can generalize this further for rows 3K+1 and 3K+2 with further twiddle factors. The twiddle factors of the twiddle factors...</p>
+		<p>We can make the following observation: If we take each third line from the beginning (in natural order, the first, fourth, seventh, tenth and thirteenth) and look at their corresponding twiddle factors, they form a perfect 5 by 5 DFT matrix. We can generalize this further for rows 3K+1 and 3K+2 with further twiddle factors multiplied elementwise to the resulting legnth 5 vector. The twiddle factors of the twiddle factors...</p>
 		
 		<img src="media/fft15_5_afterdft3_dft5.svg">
 		
@@ -229,11 +229,11 @@
 			<p class="disclaimer">From freesounds.org; made by night_soundscapes; licensed under CC BY-NC 3.0. <a href="https://freesound.org/people/night_soundscapes/sounds/321232/">source</a></p>
 		</figure>
 		
-		<p>And the full code example below. We can use the <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftfreq.html">fftfreq()</a> method of numpy to generate all frequencies, even the repeated ones and <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html">rfftfreq()</a> to also do this, but discard the later half.</p>
+		<p>And the full code example below. We can use the <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.fftfreq.html">fftfreq()</a> method of numpy to generate all frequencies, even the repeated ones; and <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.fft.rfftfreq.html">rfftfreq()</a> to also do this, but this discards the later half. Or sums that to the first part to be more precise.</p>
 		
 		{{ code("rfftfreq.py") }}
 		
-		<p>And the plotted spectrum:</p>
+		<p>And on the plotted spectrum you can see the frequencies ranging from 0 to 22100:</p>
 		
 		<img src="media/rfftfreq.png">
 		
@@ -256,6 +256,7 @@
 			<li>Ronald N. Bracewell: The Fourier Transform and its Applications third edition</li>
 			<li><a href="https://www.katjaas.nl/home/home.html">katjaas.nl</a></li>
 			<li><a href="https://www.youtube.com/playlist?list=PLuh62Q4Sv7BUSzx5Jr8Wrxxn-U10qG1et">ECSE-4530 Lectures by Rich Radke</a></li>
+			<li><a href="https://www.researchgate.net/publication/226049108_Gauss_and_the_history_of_the_fast_Fourier_transform">Gauss and the history of the fast Fourier transform</a></li>
 		</ol>
 		
 	</article>

@@ -261,7 +261,20 @@ body {
 			background-color: $mid-color;
 		}
 		
-		
+		textarea {
+			resize: none;
+			font-size: $default-font-size;
+			border-style: solid;
+			padding: 10px;
+			border-width: 1px;
+			border-color: $active-color;
+			&:hover {
+				border-color: $active-dark;
+			}
+			&:focus {
+				background-color: $active-light;
+			}
+		}
 		
 		img {
 			max-width: 100%;
