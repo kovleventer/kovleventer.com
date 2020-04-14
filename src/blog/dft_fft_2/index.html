@@ -53,11 +53,11 @@
 		<p>What did we gain from that? Nothing, as matrix multiplication is just regular multiplication and summation, and we could have done this splitting for any matrix we wanted to; the gains come now.</p>
 		
 		<ul>
-			<li><b>Step one</b>: Maybe you are already seeing it, but this is the first important discovery. If we leave out every even column and select the first half of the rows, we get back a DFT matrix with half the original size; in this case from a DFT sized six we get a smaller three sized matrix:</li>
+			<li><b>Step one</b>: Maybe you are already seeing it, but this is the first important discovery. If we leave out every even column and select the first half of the rows, we get back a DFT matrix with half the original size; in this case from a DFT of size six we get a smaller three sized matrix:</li>
 			
 			<img src="media/split_1.png">
 			
-			<p>This is no coincidence, the <span class="mat_green_700">angles of an even sized DFT matrix</span> are the same as the <span class="mat_red_700">angles of halved size matrix</span>, with some <b>additional angles</b>. Taking only each second element results in frequencies which skip the odd angles. You can see this with a DFT sized 10: As a side note even and odd were used pretty vaguely here, when we covered odd columns, we covered the first, third.. and so on where first meant literally the leftmost column. To be more precise, I should have referred to that column as the zeroth, and so the oddity would swap; but I found this unnatural and counterintuitive.</p>
+			<p>This is no coincidence, the <span class="mat_green_700">angles of an even sized DFT matrix</span> are the same as the <span class="mat_red_700">angles of halved size matrix</span>, with some <b>additional angles</b>. Taking only each second element results in frequencies which skip the odd angles. You can see this with a DFT of size 10: As a side note even and odd were used pretty vaguely here, when we covered odd columns, we covered the first, third.. and so on where first meant literally the leftmost column. To be more precise, I should have referred to that column as the zeroth, and so the oddity would swap; but I found this unnatural and counterintuitive.</p>
 			
 			<img src="media/split_halffreq.png">
 			
@@ -77,7 +77,7 @@
 			
 			<img src="media/split_3.png">
 			
-			<p>So the size 3 DFT matrix is multiplied now with some <a href="https://en.wikipedia.org/wiki/Twiddle_factor">twiddle factors</a> <i>before</i> applied to our signal. This isn't matrix multiplication nor elementwise, since the sizes don't add up. You should multiply each element with the twiddle factor in the same row. It is not hard to prove that associativity still applies here so we can switch our order of operations. That way we can apply those twiddle factors <i>after</i> we completed our smaller DFT and so right now 3 out of 4 parts start with applying DFT to a smaller part of the signal.</p>
+			<p>So the size 3 DFT matrix is multiplied now with some <a href="https://en.wikipedia.org/wiki/Twiddle_factor">twiddle factors</a> <i>before</i> applied to our signal. This isn't matrix multiplication nor elementwise, since the sizes don't add up; instead you should multiply each element with the twiddle factor in the same row. It is not hard to prove that associativity still applies here so we can switch our order of operations. That way we can apply those twiddle factors <i>after</i> we completed our smaller DFT and so right now 3 out of 4 parts start with applying DFT to a smaller part of the signal.</p>
 			
 			<li><b>Step three and a half</b>: Turns out we can actually generalize this idea through the whole second part:</li>
 			
@@ -116,7 +116,7 @@
 			<li>Lastly, we can leave our input unscrambled, but use an in place algorithm, in which case, the output will be scrambled. Maybe it's not a problem for you. This is called <b>decimation in frequency</b> whereas the earlier method was named <b>decimation in time</b>.</li>
 		</ol>
 		
-		<p>The third option is the easiest, you can see the difference on the butterfly diagram.</p>
+		<p>The third option is the easiest, you can compare the differences on the butterfly diagrams.</p>
 		
 		<img src="media/butterfly_dif.svg">
 		
@@ -190,7 +190,7 @@
 		
 		<img src="media/fft15_5_afterdft3.svg">
 		
-		<p>We can make the following observation: If we take each third line from the beginning (in natural order, the first, fourth, seventh, tenth and thirteenth) and look at their corresponding twiddle factors, they form a perfect 5 by 5 DFT matrix. We can generalize this further for rows 3K+1 and 3K+2 with further twiddle factors multiplied elementwise to the resulting legnth 5 vector. The twiddle factors of the twiddle factors...</p>
+		<p>We can make the following observation: If we take each third line from the beginning (in natural order, the first, fourth, seventh, tenth and thirteenth) and look at their corresponding twiddle factors, they form a perfect 5 by 5 DFT matrix. We can generalize this further for rows 3K+1 and 3K+2 with further twiddle factors multiplied elementwise to the resulting length 5 vector. The twiddle factors of the twiddle factors...</p>
 		
 		<img src="media/fft15_5_afterdft3_dft5.svg">
 		

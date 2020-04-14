@@ -4,6 +4,7 @@
 <head>
 	<title>{{ title }}</title>
 	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<link rel="stylesheet" type="text/css" href="media/highlight.css">
 	<meta charset="UTF-8">
 </head>
 <body>
@@ -17,22 +18,126 @@
 		
 		<p>Let's jump right into it. We can replace any repeating occurances of a letter with its repeat count, which means instead of lots of repeating characters, we'll have only two: the character itself and the count. For example this:</p>
 		
-		{{ formula("compress_before.tex") }}
+		{{ formula("simple_before.tex") }}
 		
 		<p>turns into that:</p>
 		
-		{{ formula("compress_after.tex") }}
+		{{ formula("simple_after.tex") }}
 		
 		<p>You can see it in action below. Can you break it?</p>
 		
 		<figure>
 			<textarea id="basic_compress_input" rows="4" cols="30" oninput="b_compress()">ABCCCCDEE</textarea>
 			<p>Compressed text:</p>
-			<b><p id="basic_compress_compressed">asdasd</p></b>
+			<b><p id="basic_compress_compressed"></p></b>
 			<p>Decompressed back:</p>
 			<b><p id="basic_compress_decompressed"></p></b>
 			<p id="basic_compress_nomatch" style="display: none"><b><span class="plt_red">Oh no you broke it!</span></b></p>
 		</figure>
+		
+		<p>So, this method has a critical flaw, when you enter a numerical digit as input, it will be interpreted as a number in the decompression phase and will mess with the repeat counts. We haven't specified that our input can't contain any numbers, and we shouldn't: compression methods will likely be used on binary data, where every byte can have a value from 0 to 255. So what can we do to fix this?</p>
+		
+		<ul>
+			<li>Store the repetition count for each letter. In the earlier example this count had a dynamic size, for example 10 took two characters of space. We could store an arbitrarily high count this way, but usually a fixed size is easier to work with. It depends on your data, but it's rare to see a byte repeated for 200 times so it might come as a surprise that we will still reserve a whole byte for storing this count. Because of that we won't have bother with shifting and reassembling bytes when we read our next value.</li>
+			
+			<p><b>What happens if we pass this fixed size limit and we have a byte repeated 257 times?</b> It's simple, we just start a new block. You can see this in action right below. Since the counts are stored as raw byte values, they won't always have valid ASCII counterparts. To make the visualization nicer, I encompassed these numbers with parentheses. You can attempt to break it, but note first, that the decompression will use the underlying byte values instead of parsing the displayed string.</p>
+			
+			<figure>
+				<textarea id="repc_compress_input" rows="4" cols="30" oninput="repc_compress()">ABCCCCDEE</textarea>
+				<p>Compressed text:</p>
+				<b><p id="repc_compress_compressed">asdasd</p></b>
+				<p>Decompressed back:</p>
+				<b><p id="repc_compress_decompressed"></p></b>
+				<p id="repc_compress_nomatch" style="display: none"><b><span class="plt_red">Oh no you broke it!</span></b></p>
+			</figure>
+			
+			<li>As you can see, this way the file can become way larger than the original, if the repetitions are sparse enough. We wanted compression, but we ended up exploding our file. If only there was a way to turn this whole procedure off for specific chunks of the file. We have to utilize additional an additional byte or bit for this, if this flag is true, then the next few values will be interpreted as if they were compressed, otherwise as raw values.</li>
+			
+			<li>We can do this repetition detection a bit smarter, and this way we can avoid this whole mess of additional flag bits. For example, with <i>N = 3</i>, we can do the following: For repetitions larger or equal to 3, we'll write the repeating byte 3 times, and then the count. For repetitions with size 1 or 2, we just use the raw values. This also has the side effect of <b>negative compression</b>, but only for repetitions with size 3. You can also tweak this parameter N according to your needs.</li>
+			
+			<p>So for N=3, this:</p>
+			
+			{{ formula("mnp5_before.tex") }}
+			
+			<p>compresses to that:</p>
+			
+			{{ formula("mnp5_after.tex") }}
+			
+			<p>The testing area below uses the same (count) notation shown earlier:</p>
+			
+			<figure>
+				<textarea id="mnp5_compress_input" rows="4" cols="30" oninput="mnp5_compress()">ABBCCCCCCDDDEEF</textarea>
+				<p>Compressed text:</p>
+				<b><p id="mnp5_compress_compressed">asdasd</p></b>
+				<p>Decompressed back:</p>
+				<b><p id="mnp5_compress_decompressed"></p></b>
+				<p id="mnp5_compress_nomatch" style="display: none"><b><span class="plt_red">Oh no you broke it!</span></b></p>
+			</figure>
+		</ul>
+		
+		<h3>Repetition count zero</h3>
+		
+		<p>We can see that the repetition count of zero has no use in the previous examples. How can we use this extra value? We can store an extra repetition count, or maybe more in the last case. As the compressed version of <b>CCCCCCCC</b> (8 times C), instead of <b>CCC8</b>, we can write <b>CCC5</b> (5 = 8-3). This way we can save a few bytes for longer counts.</p>
+		
+		<h2>Binary RLE</h2>
+		
+		<p>We can make a few simplifications if we restrict the possible range of values into two, for example ones or zeros, or black and white pixels on a faxed image. In these cases we only have to store the repeat counts, any change of values specifies the next value exactly, since only two of them are possible. The only remaining question is how to store the first value, which can be either black or white, but we can make use of the special 0 value then: specify that our data it always starts with white, even if it isn't; in that case we'll have a run of length zero in the beginning.s</p>
+		
+		<p>You can see this below on a black and white image encoded in <b>row major order</b> (<img style="height:100px" class="inline" src="media/binary_row_major.png">). Click on the tiles to change their values.</p>
+		
+		<figure>
+			<canvas id="bin_rle"></canvas>
+			<b><p id="bin_compressed"></p></b>
+		</figure>
+		
+		<h2>A concrete example: the TGA format.</h2>
+		
+		<p>RLE has its use in real world applications as well. Even if you haven't heard about the <a href="https://en.wikipedia.org/wiki/Truevision_TGA">TARGA</a> format, you probably had used JPEG in the past, which also utilizes some sort of RLE. Here's an <a href="media/smiley.tga">example file</a> to show how it's done.</p>
+		
+		<p>I'm not going to delve deep into the TGA specification, but here are the most important bits of the header (first 18 bits in this case):</p>
+		
+		<p><span class="mono">hexdump -C -n18 smiley.tga</span></p>
+		
+		<p><span class="mono">00 00 <span class="strong_highlight_1">0A</span> 00 00 00 00 00 <span class="strong_highlight_2">00 00 40 00</span> <span class="strong_highlight_3">40 00 40 00</span> <span class="strong_highlight_4">18</span> <span class="strong_highlight_5">20</span></span></p>
+		
+		<ul>
+			<li><span class="strong_highlight_1">0A</span>: indicates RLE compression and true color (no colormap).</li>
+			<li><span class="strong_highlight_2">00 00 40 00</span>: image offset. For some reason TGAs start at the bottom left corner by default, so we offset it by the height of the image (64 pixels (0x40)).</li>
+			<li><span class="strong_highlight_3">40 00 40 00</span>: image width and height (64x64).</li>
+			<li><span class="strong_highlight_4">18</span>: 0x18 = 24 bits per pixel. One byte of R, G and B.</li>
+			<li><span class="strong_highlight_5">20</span>: ordering, since we start at the top left corner, we also have to reverse the vertical direction.</li>
+		</ul>
+		
+		<p>After the header comes the image data. As you can see the image has parts with large patches of a single color, and gradients where the neighboring colors all differ from each other slightly. So, how does our compression handles this?<p>
+		
+		<p>The method is similar to <a href="https://en.wikipedia.org/wiki/PackBits">PackBits</a>. Basically we sacrifice one bit from our count byte in order to indicate compression. If that bit is active, it indicates compression, the next byte must be repeated 5 times. <a class="hoverbutton" onmouseover="packb_noc()" onmouseout="packb_c()">Otherwise</a>, the next five bytes must be interpreted as raw values.</p>
+		
+		<img id="packb" src="media/packb_compress.png">
+		
+		<p>Of course we are dealing with pixels now, so instead of the next byte, we'll use this for the next 3 bytes. Let's read the next line (skip the first 18 bytes then read 57):</p>
+		
+		<p><span class="mono">hexdump -C -s 18 -n57 smiley.tga</span></p>
+		
+		<p><span class="mono"><span class="strong_highlight_6">97</span> <span class="strong_highlight_7">66 44 22</span> <span class="strong_highlight_8">0f</span> <span class="strong_highlight_9">7a 53 41</span> <span class="strong_highlight_9">9c 5b 75</span> <span class="strong_highlight_9">b5 54 98</span> <span class="strong_highlight_9">c5 48</span></span></p>
+		<p><span class="mono"><span class="strong_highlight_9">af</span> <span class="strong_highlight_9">d1 3b bf</span> <span class="strong_highlight_9">d8 34 c7</span> <span class="strong_highlight_9">da 30 cc</span> <span class="strong_highlight_9">db 2f cc</span> <span class="strong_highlight_9">da 30 cb</span></span></p>
+		<p><span class="mono"><span class="strong_highlight_9">d8 34 c8</span> <span class="strong_highlight_9">d4 39 c3</span> <span class="strong_highlight_9">cd 41 b9</span> <span class="strong_highlight_9">c2 4c ab</span> <span class="strong_highlight_9">b2 58 93</span> <span class="strong_highlight_9">9a</span></span></p>
+		<p><span class="mono"><span class="strong_highlight_9">5f 71</span> <span class="strong_highlight_9">79 55 3f</span> <span class="strong_highlight_10">97</span> <span class="strong_highlight_11">66 44 22</span></span></p>
+		
+		<p>The first byte <span class="strong_highlight_6">97</span> indicates compression (0x97 = 0x80 + 0x17) and that the next three bytes must be repeated 0x17 = 23 times. Or actually 24 times, since the repetition count zero indicates one repetition and so on. The following three bytes specify the pixel in BGR order. The <span class="strong_highlight_8">0f</span> byte tells us no compression and that the next (0x0F + 1) * 3 = 48 bytes must be interpreted as raw pixel data. Finally (<span class="strong_highlight_10">97</span>) we have the same 24 bytes as in the beginning.</p>
+		
+		<p>Also note how the tracking of repetitions stopped at the end of the line, even though we could have continued with the next, as it had the same deep blue color. This behaviour is specified (albeit kind of <a href="https://en.wikipedia.org/wiki/Truevision_TGA#Specification_discrepancies">vaguely</a> in the TGA specification.</p>
+		
+		<h2>Endnote</h2>
+		
+		<p>We saw how RLE compression works, but also that we have to be careful how we represent our data. For texts should we store it as plain bytes, <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> characters or raw bits and compress the ones and zeros? For images, should we parse it in row major or column major order, or even in zig-zag? Should we compress the red, green and blue channels separately? For these purposes there are more sophisticated and more universal compression methods, but they require some groundwork.</p>
+		
+		<h2>Sources</h2>
+		
+		<ol>
+			<li><a href="https://www.fileformat.info/format/tga/egff.htm">TGA File Format Summary</a></li>
+			<li>Murray, James D. , Van Ryper, William Encyclopedia of Graphics File Formats, 2nd Edition</li>
+			<li>David Salomon Data Compression The Complete Reference Fourth Edition</li>
+		</ol>
 		
 	</article>
 	<script src="tscript.js"></script>

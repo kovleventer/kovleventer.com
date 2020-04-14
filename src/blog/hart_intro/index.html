@@ -17,7 +17,7 @@
 		<p>While HART claims to be an open protocol, I found the concrete specifications really hard to acquire, since they aren't public and are locked behind paywalls. With the few documentations available somewhere on the internet, one can set up a working communication channel, but this isn't an easy task. This article covers</p>
 		
 		<ul>
-			<li><b>software level</b>: not discussing how the digital signal is modulated to fit the 4-20mA analog signal without interference, but rather what commands to send to the serial port. Also in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>, this software level means the <b>data link layer</b> (and the lowest level of the appliation layer), not the physical or the full application layer.</li>
+			<li><b>software level</b>: not discussing how the digital signal is modulated to fit the 4-20mA analog signal without interference, but rather what commands to send to the serial port. Also in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>, this software level means the <b>data link layer</b> (and the lowest level of the application layer), not the physical or the full application layer.</li>
 			<li><b>HART 5</b> protocol version: fairly old but still relevant</li>
 			<li><b>wired serial</b> communication, so wireless is beyond the scope of this post</li>
 		</ul>
@@ -80,7 +80,7 @@
 			
 			<li><span class="strong_highlight_4">00</span>: Command number. In this case the command number is zero, so nothing to explain further.</li>
 			
-			<li><span class="strong_highlight_5">00</span>: The length of the message (only the additional data part). This data part is used for storing parameters, but since command 0 has no parameters, the value of this byte will be zero.</li>
+			<li><span class="strong_highlight_5">00</span>: The length of the message (only the additional data part). This data part is used for storing parameters, but since command 0 has no parameters, the value of this byte will be zero as well.</li>
 			
 			<li><span class="strong_highlight_6">82</span>: Checksum. Calculated by <a href="https://en.wikipedia.org/wiki/Bitwise_operation#XOR">XOR</a>ing the all bytes in the frame excluding the preamble.</li>
 			
@@ -101,7 +101,7 @@
 			<li><span class="strong_highlight_1">FF</span>: The field device also sends preambles as well. In order to make this section less repetitive, I am goind to omit parts which were already covered.</li>
 			<li><span class="strong_highlight_2">06</span>: As you can see, 06 means response.</li>
 			<li><span class="strong_highlight_5">0E</span>: We have 0x0E pieces of data bits (14 in decimal) which means the next 14 bytes will be the data of the response.</li>
-			<li><span class="strong_highlight_7">00</span>: Response code / error code / communication status. If the first bit is active, then it indicates a communication error: something went wrong during the serial transmission, and the remaining seven bits indicate the error. Otherwise if the first bit is off, this byte should be interpreted as a response code, 00 means everything is fine, different values mean different errors, but they are device and command specific.</li>
+			<li><span class="strong_highlight_7">00</span>: Response code / error code / communication status. If the first bit is active, then it indicates a communication error: something went wrong during the serial transmission, and the remaining seven bits indicate the error. Otherwise if the first bit is off, this byte should be interpreted as a response code, 00 means everything is fine, different values mean different errors, but they are specific to devices and commands.</li>
 			<li><span class="strong_highlight_8">80</span>: Similar status bitfield as the previous one, but this time the actual bits are more clearly defined:</li>
 			<table>
 				<tr>
@@ -153,7 +153,7 @@
 			
 			<li><span class="strong_highlight_14">00</span>: Flags, I have never seen them in use. You can probably find the meaning of its respective bits in some documentation, but for the devices I used, they never presented any usable information.</li>
 			
-			<li><span class="strong_highlight_15">2A BC 31</span>: Device ID number, which is supposed to be unique for each and every device form the same manufacturer with the same device ID. The three bytes represent a 24 bit integer, but I found confliction information about its <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>. While you are going to use this value later with long addressing, this number will get converted back to bytes, so the <i>interpretation</i> of the bytes doesn't really matter, only their values do.</li>
+			<li><span class="strong_highlight_15">2A BC 31</span>: Device ID number, which is supposed to be unique for each and every device form the same manufacturer with the same device ID. The three bytes represent a 24 bit integer, but I found conflicted information about its <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>. While you are going to use this value later with long addressing, this number will get converted back to bytes, so the <i>interpretation</i> of the bytes doesn't really matter, only their values do.</li>
 			
 			<li><span class="strong_highlight_6">6C</span>: Checksum is calculated in the response as well.</li>
 		</ul>
