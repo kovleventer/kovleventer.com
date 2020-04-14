@@ -51,7 +51,7 @@
 				<p id="repc_compress_nomatch" style="display: none"><b><span class="plt_red">Oh no you broke it!</span></b></p>
 			</figure>
 			
-			<li>As you can see, this way the file can become way larger than the original, if the repetitions are sparse enough. We wanted compression, but we ended up exploding our file. If only there was a way to turn this whole procedure off for specific chunks of the file. We have to utilize additional an additional byte or bit for this, if this flag is true, then the next few values will be interpreted as if they were compressed, otherwise as raw values.</li>
+			<li>As you can see, this way the file can become way larger than the original, if the repetitions are sparse enough. We wanted compression, but we ended up exploding our file. If only there was a way to turn this whole procedure off for specific chunks of the file. We have to utilize an additional byte or bit for this, if this flag is true, then the next few values will be interpreted as if they were compressed, otherwise as raw values.</li>
 			
 			<li>We can do this repetition detection a bit smarter, and this way we can avoid this whole mess of additional flag bits. For example, with <i>N = 3</i>, we can do the following: For repetitions larger or equal to 3, we'll write the repeating byte 3 times, and then the count. For repetitions with size 1 or 2, we just use the raw values. This also has the side effect of <b>negative compression</b>, but only for repetitions with size 3. You can also tweak this parameter N according to your needs.</li>
 			
@@ -129,7 +129,7 @@
 		
 		<h2>Endnote</h2>
 		
-		<p>We saw how RLE compression works, but also that we have to be careful how we represent our data. For texts should we store it as plain bytes, <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> characters or raw bits and compress the ones and zeros? For images, should we parse it in row major or column major order, or even in zig-zag? Should we compress the red, green and blue channels separately? For these purposes there are more sophisticated and more universal compression methods, but they require some groundwork.</p>
+		<p>We saw how RLE compression works, but also that we have to be careful how we represent our data. For texts should we store them as plain bytes, <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> characters or raw bits and compress the ones and zeros? For images, should we parse them in row major or column major order, or maybe in zig-zag? Should we compress the red, green and blue channels separately? For these purposes there are more sophisticated and more universal compression methods, but they require some groundwork.</p>
 		
 		<h2>Sources</h2>
 		

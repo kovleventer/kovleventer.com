@@ -167,7 +167,7 @@ function mnp5_compress() {
 	
 	let decompressed : string = "";
 	let lastChar = "";
-	for (var i = 0; i < input.length; i++) {
+	for (var i = 0; i < compressed.length; i++) {
 		if (typeof compressed[i] === "string") {
 			decompressed += compressed[i];
 			lastChar = compressed[i];
@@ -177,6 +177,7 @@ function mnp5_compress() {
 			}
 		}
 	}
+	
 	const p_decompressed = document.getElementById("mnp5_compress_decompressed");
 	p_decompressed.innerText = decompressed;
 	
