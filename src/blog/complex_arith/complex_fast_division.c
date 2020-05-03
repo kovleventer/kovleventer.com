@@ -1,4 +1,4 @@
-Complex c_div(Complex c1, Complex c2) {
+Complex c_div_fast(Complex c1, Complex c2) {
 	float k1 = c1.real * (c2.real + c2.imag);
 	float k2 = c2.real * (c1.real + c1.imag);
 	float k3 = c2.imag * (c1.real - c1.imag);

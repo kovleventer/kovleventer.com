@@ -14,16 +14,16 @@
 		<p><a href="https://en.wikipedia.org/wiki/Complex_number">Complex numbers</a> have a wide range of applications including the previously discussed Fourier transform. This article doesn't aim to be an introduction for complex numbers, but rather discuss the various representations of them. I'm not going deep into the cubic equatations and the problems with the formulas discovered for it, but a quick rundown does not hurt:</p>
 		
 		<ol>
-			<li>First, the need arised to express the square root of negative numbers, which were previously thought to be impossible. These were <b>imaginary numbers</b> and squaring one yielded a negative real number back. Also it is worth mentioning that an imaginary number corresponded to each negative real number.</li>
+			<li>First, the need arised to express the square root of negative numbers, which were previously thought to be impossible. These were <b>imaginary numbers</b> and squaring one yielded a negative real number back. Also it is worth mentioning that an imaginary number corresponded to each negative real number and vice versa.</li>
 			<li>We wanted to keep these new numbers as compatible with our old systems as we could, so we could make some rearrangments:</li>
 			
 			{{ formula("def_rearrange.tex") }}
 			
-			<p>Now instead of keeping track of infinitely many imaginary numbers, we can reduce all of them to one, the simplest. Thus we can define j (or i as you prefer):</p>
+			<p>Now instead of keeping track of infinitely many imaginary numbers, we could reduce all of them to one, the simplest. Thus we defined j (or i as you prefer):</p>
 			
 			{{ formula("def_j.tex") }}
 			
-			<li>Finally we can combine real and imaginary numbers to get <b>complex numbers</b>:</li>
+			<li>Finally we could combine real and imaginary numbers to get <b>complex numbers</b>:</li>
 			
 			{{ formula("def_34.tex") }}
 			
@@ -98,7 +98,7 @@
 			<tr><td><b>/</b></td><td><img src="media/smiley_div.png" style="height: 50px;"></td></tr>
 		</table>
 		
-		<p>Also for now I'll refer substraction as addition for now to make things easier.</p>
+		<p>Also for now I'll refer substraction as addition to make things easier.</p>
 		
 		<p>Finally we need to do some work to get the <b>division</b> done:</p>
 		
@@ -130,14 +130,122 @@
 		
 		<h2>Polar form</h2>
 		
+		<p>We can also rewrite our complex numbers into polar coordiantes. Instead of representing them with real and imaginary values, we can define a length and angle for each complex number:</p>
+		
+		<figure>
+			<canvas id="polar_complex"></canvas>
+		</figure>
+		
+		<p>We can present this new form with sines and cosines:</p>
+		
+		{{ formula("polar_def.tex") }}
+		
+		<p>Where <i>r</i> and <i>θ</i> can be obtained from (using <a href="https://en.wikipedia.org/wiki/Atan2">atan2</a> here):</p>
+		
+		{{ formula("polar_rtheta.tex") }}
+		
+		<p>And we can use <a href="https://en.wikipedia.org/wiki/Euler%27s_formula">Euler's formula</a> to simplify our notation and this allows for the use of nice exponentional identities.</p>
+		
+		{{ formula("polar_euler.tex") }}
+		
+		<p>You are probably already familiar with this. The emphasis in this article is on how can this form used to accelerate our computations. The good news is that complex multiplication becomes really simple, it only takes <span class="plt_yellow">one real multiplication</span> and <span class="plt_green">one addition</span>:</p>
+		
+		{{ formula("polar_mul.tex") }}
+		
+		<p>Also the division simplifies as well to <span class="plt_red">one real division</span> and <span class="plt_green">one substraction</span>:</p>
+		
+		{{ formula("polar_div.tex", amsmath=False) }}
+		
+		<p>Cool, now what about addition? The bad news is that you can't really do that withoud converting back to rectangular form. And this conversion really takes its toll: <b>two squarings</b>, a <b>square root</b>, an <b>arctangent</b> one way, <b>sines</b> and <b>cosines</b> with <b>multiplications</b> backwards. These operations are usually much slower than the regular arithmetic ones, so in practice where you have to do additions as well, this form is rarely used.</p>
+		
+		<p>If you happen to have a use case where lots of repeated complex multiplications take place without any additions meanwhile, this might be useful, but otherwise you are better off with the regular form.</p>
+		
 		<h2>Complex-base systems</h2>
+		
+		<p>The ideas presented in this section are fundamentally different than what we've seen earlier. We used two floats (real and imag or r and theta) to represent our numbers. We could have used integers, doubles, or any other numeric types, but the main idea here is that we had our data separate parts.</p>
+		
+		<p>Maybe if we could store a complex number as a simple entity, than we could do addition in one step instead of two real additions and other arithmetic operations would simplify as well. Of course this would require specific cirquitry with new arithmetical modules designed specifically for this.</p>
+		
+		<p>Before we dig into the complex bases, we'll need first to discuss negative bases.</p>
+		
+		<h3>Negative radix numeral systems</h3>
+		
+		<p>We use <a href="https://en.wikipedia.org/wiki/Positional_notation">positional numeral systems</a> every day and it is the most nautral to us. Whether it is base 10 or 2 or 16, it works by the same principles:</p>
+		
+		<ol>
+			<li>Numbers are represented by a poliniomial of the base <i>b</i> and the digits <i>a</i>:</li>
+			
+			{{ formula("base_long.tex") }}
+			
+			<p>Or if you like the simplified notation with sums:</p>
+			
+			{{ formula("base_short.tex", amsmath=False) }}
+			
+			<p>So for example the number 1234 is made up from 1*1000 + 2*100 + 3*10 + 4*1. This also gives us a method for base conversion, but that is a different story.</p>
+			
+			<li>Digits have a maximal value lower than the base. Binary systems only use 0 and 1, and in decimal there is no single digit for ten and eleven and so on.</li>
+		</ol>
+		
+		<p>We can apply the first principle easily to negative values of <i>b</i>. But what about the second? With a base -3, should the digits have the value -2, -1, 0, or -4, -5, etc down to minus infinity?</p>
+		
+		<p>Or something else. We can just use our regular digits, as if <i>b</i> were positive. For -3 this means 2, 1 and 0. Here's an example for negabinary systems.</p>
+		
+		<figure>
+			<canvas id="negnum" style="margin-bottom: 20px; cursor: pointer;"></canvas>
+			<input type="number" id="neg_display" min="-43690" max="21845"/>
+		</figure>
+		
+		<p>It is also interesting to see how each additional digit pushes our boundaries. On one bit I can express either 0 or 1. With two bits this range is -2 to 1. The table below shows the minimal and maximal potential values up to eight bits:<p>
+		
+		<table>
+			<tr><th>Digits</th><th>Min</th><th>Max</th></tr>
+			<tr><td>1</td><td>0</td><td>1</td></tr>
+			<tr><td>2</td><td>-2</td><td>1</td></tr>
+			<tr><td>3</td><td>-2</td><td>5</td></tr>
+			<tr><td>4</td><td>-10</td><td>5</td></tr>
+			<tr><td>5</td><td>-10</td><td>21</td></tr>
+			<tr><td>6</td><td>-42</td><td>21</td></tr>
+			<tr><td>7</td><td>-42</td><td>85</td></tr>
+			<tr><td>8</td><td>-170</td><td>85</td></tr>
+		</table>
+		
+		<p>Looks like some kind of oscillation, where the boudaries are pushed with steps that double with each digit. Anyways, with this introduction it's time to hop on to some more complex systems.</p>
+		
+		<h3>Base 2j</h3>
+		
+		<p>A few compley bases were introduced and analyzed in the previous decades, I'll discuss three of them. The <b>2j base</b> was introduced by Donald Knuth in 1960. Using our first principle we can see how this system works. As you can see, it can be divided into two parts: odd digits are complex while even ones are real; more specifically the form a negative base (-4).</p>
+		
+<!-- 		{{ formula("2j_repr.tex") }} -->
+		<img src="media/2j_repr.svg">
+		
+		<div class="infobox info">
+			<p>Fractional parts work alongside the same rules, those digits would be -j/2, -1/4 and so on. It is also an interesting topic that how would we represent those numbers: in a fixed point or a floating point system, but we'll restrict ourselves for integers (fixed point numbers work the same way) now.</p>
+		</div>
+		
+		<p>We have to use four different digits now; from 0 to 3. The representation is simple and based on two negative radix systems, but we have to be a bit careful. The imaginary parts start at 2j, and for example this causes j to be represented as 10.2 in this system; as you can see it has a fractional part. The decimal point (or quater-imaginary point) is marked with a black separator below.</p>
+		
+		<figure>
+			<canvas id="2jrepr" style="margin-bottom: 20px; cursor: pointer;"></canvas>
+			<p style="font-size: 25px;">
+				<input type="number" id="2jr_display" min="-43690" max="21845"/><span> + j*</span>
+				<input type="number" id="2ji_display" min="-43690" max="21845" step=".5"/>
+			</p>
+		</figure>
 		
 		<h2>Sources</h2>
 		
 		<ol>
-			<li>Aleksandr Cariow "An algorithm for dividing two complex numbers" (<a href="https://arxiv.org/abs/1608.07596">arxiv</a>)</li>
+			<li>Aleksandr Cariow, An algorithm for dividing two complex numbers (<a href="https://arxiv.org/abs/1608.07596">arXiv</a>)</li>
+			<li>D. E. Knuth, The Art of Computer Programming Volume 2</li>
+			<li>V. N. Stepanenko, Computer arithmetic of complex numbers</li>
+			<li>Walter Penney, A 'Binary' System for Complex Numbers</li>
+			<li>Tariq Jamil, The complex binary number system</li>
+			<li>D. E. Knuth, An Imaginary Number System</li>
+			<li>Jarek Duda, Complex base numeral systems.</li>
+			<li>Philip Herd, Imaginary Number Bases (<a href="https://arxiv.org/abs/1701.04506">arXiv</a>)</li>
 		</ol>
 		
 	</article>
+	<script src="tscript.js"></script>
 </body>
 </html>
