@@ -101,6 +101,7 @@ neg_canvas.addEventListener('click', function(e) {
 
 neg_display.addEventListener('input', function() {
 	let n = parseInt(neg_display.value);
+	if (isNaN(n)) return;
 	for (var i = 15; i >= 0; i--) {
 		neg_data[i] = Math.abs(n % -2);
 		n = Math.floor(n / -2);
@@ -161,16 +162,35 @@ j2repr_canvas.addEventListener('click', function(e) {
 	
 }, false);
 
-//TODO num2quaterim
-/*neg_display.addEventListener('input', function() {
-	let n = parseInt(neg_display.value);
-	for (var i = 15; i >= 0; i--) {
-		neg_data[i] = Math.abs(n % -2);
-		n = Math.floor(n / -2);
-		if (neg_data[i] == 1) n++;
+j2r_display.addEventListener('input', function() {
+	let n = parseInt(j2r_display.value);
+	if (isNaN(n)) return;
+	for (var i = 14; i >=0; i-=2) {
+		j2repr_data[i] = n % -4;
+		n = Math.sign(n / -4) * Math.floor(Math.abs(n / -4));
+		if (j2repr_data[i] < 0) {
+			j2repr_data[i] += 4;
+			n++;
+		}
 	}
 	
 	render_2jrepr();
-}, false);*/
+}, false);
+
+j2i_display.addEventListener('input', function() {
+	let n = parseInt(j2i_display.value);
+	if (isNaN(n)) return;
+	n *= -2;
+	for (var i = 15; i >=0; i-=2) {
+		j2repr_data[i] = n % -4;
+		n = Math.sign(n / -4) * Math.floor(Math.abs(n / -4));
+		if (j2repr_data[i] < 0) {
+			j2repr_data[i] += 4;
+			n++;
+		}
+	}
+	
+	render_2jrepr();
+}, false);
 
 render_2jrepr();

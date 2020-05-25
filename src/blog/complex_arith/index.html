@@ -227,10 +227,94 @@
 		<figure>
 			<canvas id="2jrepr" style="margin-bottom: 20px; cursor: pointer;"></canvas>
 			<p style="font-size: 25px;">
-				<input type="number" id="2jr_display" min="-43690" max="21845"/><span> + j*</span>
-				<input type="number" id="2ji_display" min="-43690" max="21845" step=".5"/>
+				<input type="number" id="2jr_display" min="-52428" max="13107"/><span> + j*</span>
+				<input type="number" id="2ji_display" min="-6553.5" max="26214" step="any"/>
 			</p>
 		</figure>
+		
+		<p>It is also interesting to see how each new digit adds new covered values in a circular manner (it's an .svg file, so you can zoom in to see the lower digits):</p>
+		
+		<a href="media/2j_digit_expan.svg"><img src="media/2j_digit_expan.svg"></a>
+		
+		<p>The next question is: how can we carry out arithmetic operations in this form? It is hard to keep track of the digits in a regular processor, and due to the extra operations, this will become really slow, thus rendering our efforts to make a fast system worthless. Hence we need to dig deeper, and the implementations below will be done in a <a href="https://en.wikipedia.org/wiki/Hardware_description_language">hardware descriptor language</a> (Verilog) on a simple logical gate level. It would be also worth investigating how the various overly optimized implementations for <a href="https://en.wikipedia.org/wiki/Adder_(electronics)">adders</a> and multipliers work for this representation, but this is out of scope of this article.</p>
+		
+		<p>As a reminder an adder adds two numbers together, nothing surprising here. These adders can be decomposed to smaller adders each of which operates on single bits. A <b>full adder</b> has three inputs: two for the operands and one for the carry. It's output consists of two bits: the sum and the carry out, which will be wired to the next full adder's carry input.</p>
+		
+		<p>To illustrate this, here's how a single full adder module looks like (on interface level):</p>
+		
+		<img src="media/fadd_bit.svg">
+		
+		<p>... the implementation in verilog:<p>
+		
+		{{ code("fadd.v", "verilog") }}
+		
+		<p>... and the cascaded ripple carry adder for four bits:</p>
+		
+		<img src="media/fadd_4bit.svg">
+		
+		<p>Things get more complicated in the negative base case. For a negabinary adder, whenever a carry occurs and gets transferred to the next digit, the signs flip, and ultimately we have to substract this carry. Let's see how this works with a truth table:</p>
+		
+		<style>
+			table.truth3x2 td:nth-child(3), table.truth3x2 th:nth-child(3) {
+				border-right: 5px solid black;
+			}
+		</style>
+		<table class="truth3x2">
+			<tr><th>A</th><th>B</th><th>C_in-</th><th>S</th><th>C_out-</th></tr>
+			<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+			<tr style="background-color: #FF8888"><td>0</td><td>0</td><td>1</td><td>?</td><td>?</td></tr>
+			<tr><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+			<tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+			<tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+			<tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+		</table>
+		
+		<p>In the second row, the result is -1, should we add the resulting carry to the next digit? Yes, exactly. This introtuces a new type of carry, the positive one ( <b>C_in+</b> and <b>C_out+</b>), which means we'll have four bits as inputs. It is also worth mentioning that both carries can not be true at the same time and that reduces the possible combinations from 16 to 12.</p>
+		
+		<style>
+			table.truth4x3 td:nth-child(4), table.truth4x3 th:nth-child(4) {
+				border-right: 5px solid black;
+			}
+		</style>
+		<table class="truth4x3" style="width: 70%">
+			<tr><th>A</th><th>B</th><th>C_in+</th><th>C_in-</th><th>S</th><th>C_out+</th><th>C_out-</th></tr>
+			<tr><td>0</td><td>0</td><td>0</td><td>0</td> <td>0</td><td>0</td><td>0</td></tr>
+			<tr><td>0</td><td>0</td><td>0</td><td>1</td> <td>1</td><td>1</td><td>0</td></tr>
+			<tr><td>0</td><td>0</td><td>1</td><td>0</td> <td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>0</td><td>1</td><td>0</td><td>0</td> <td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>0</td><td>1</td><td>0</td><td>1</td> <td>0</td><td>0</td><td>0</td></tr>
+			<tr><td>0</td><td>1</td><td>1</td><td>0</td> <td>0</td><td>0</td><td>1</td></tr>
+			<tr><td>1</td><td>0</td><td>0</td><td>0</td> <td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>1</td><td>0</td><td>0</td><td>1</td> <td>0</td><td>0</td><td>0</td></tr>
+			<tr><td>1</td><td>0</td><td>1</td><td>0</td> <td>0</td><td>0</td><td>1</td></tr>
+			<tr><td>1</td><td>1</td><td>0</td><td>0</td> <td>0</td><td>0</td><td>1</td></tr>
+			<tr><td>1</td><td>1</td><td>0</td><td>1</td> <td>1</td><td>0</td><td>0</td></tr>
+			<tr><td>1</td><td>1</td><td>1</td><td>0</td> <td>1</td><td>0</td><td>1</td></tr>
+		</table>
+		
+		<p>The block overview for this negabinary adder has two new wires for carry:</p>
+		
+		<img src="media/negafadd_bit.svg">
+		
+		<p>On the other hand the Verilog code is not as simple as it was before, we have to do some bit operations by hand:</p>
+		
+		{{ code("negafadd.v", "verilog") }}
+		
+		<p>And cascading it works as you would expect:</p>
+		
+		<img src="media/negafadd_4bit.svg">
+		
+		<p>We can use this idea to construct a quater-imaginary full adder, but we have to be careful about two things. First, this complex number is made up from alternating imaginary and real digits, and second, the <b>effective negative base</b> of this system is -4, not -2 as it were in the negabinary case. All in all, the main operands take two bits of space now, but the carries stay at the same size:</p>
+		
+		<img src="media/qimagfadd_bit.svg">
+		
+		<p>In Verilog code:</p>
+		
+		{{ code("qimagfadd.v", "verilog") }}
+		
+		<p>And now the wiring is slightly more complicated; in total we have four bits as carries:</p>
 		
 		<h2>Sources</h2>
 		
