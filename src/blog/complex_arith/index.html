@@ -316,6 +316,14 @@
 		
 		<p>And now the wiring is slightly more complicated; in total we have four bits as carries:</p>
 		
+		<img src="media/qimagfadd_4bit.svg">
+		
+		<p>Substraction works pretty much the same, except you will find much more positive carries in the truth tables.</p>
+		
+		<p>Before we continue with multiplication, let's sum up what we <i>really</i> did. We presented a new representation, in which addition took only one step instead of two. But in the meantime, the magnitude of these numbers did not really change, so instead of using two 8 bit numbers as real and imaginary parts, we had a 16 bit complex number, which covered (roughly) the same numerical range. You could also say that we could parallelise this new addition by real and imaginary digits — but that also holds true, when these parts are kept in separate numbers. In conclusion this representation won't gain as significant speedups in addition.</p>
+		
+		<p></p>
+		
 		<h2>Sources</h2>
 		
 		<ol>

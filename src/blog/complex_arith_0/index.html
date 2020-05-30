@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p><a href="https://en.wikipedia.org/wiki/Complex_number">Complex numbers</a> have a wide range of applications including the previously discussed Fourier transform. This article doesn't aim to be an introduction for complex numbers, but rather discuss the various representations of them. I'm not going deep into the cubic equatations and the problems with the formulas discovered for it, but a quick rundown does not hurt:</p>
+		
+		<ol>
+			<li>First, the need arised to express the square root of negative numbers, which were previously thought to be impossible. These were <b>imaginary numbers</b> and squaring one yielded a negative real number back. Also it is worth mentioning that an imaginary number corresponded to each negative real number and vice versa.</li>
+			<li>We wanted to keep these new numbers as compatible with our old systems as we could, so we could make some rearrangments:</li>
+			
+			{{ formula("def_rearrange.tex") }}
+			
+			<p>Now instead of keeping track of infinitely many imaginary numbers, we could reduce all of them to one, the simplest. Thus we defined j (or i as you prefer):</p>
+			
+			{{ formula("def_j.tex") }}
+			
+			<li>Finally we could combine real and imaginary numbers to get <b>complex numbers</b>:</li>
+			
+			{{ formula("def_34.tex") }}
+			
+			<div class="infobox info">
+				<p>Just to be clear, reals are a subset of complex numbers, so 1, 2 and 3 will be complex as well.</p>
+			</div>
+		</ol>
+		
+		<h2>Basic operations</h2>
+		
+		<p>Complex numbers are defined by their real and imaginary parts. We can also represent them in a coordinate system, where the x axis represents the real part and y is imaginary.</p>
+		
+		<div class="horizontal_split">
+			<div>
+				{{ code("complex_34.c", "c") }}
+			</div>
+			<div>
+				{{ formula("def_34.tex") }}
+			</div>
+			<div>
+				<img src="media/coord_34.svg">
+			</div>
+		</div>
+		
+		<p><b>Addition</b> between two complex numbers is simple, just add their components independently, like you would do with vectors.</p>
+		
+		{{ code("complex_addition.c", "c") }}
+		
+		<div class="horizontal_split">
+			<div>
+				{{ formula("c_add.tex") }}
+			</div>
+			<div>
+				<img src="media/c_add.svg">
+			</div>
+		</div>
+		
+		<p><b>Substraction</b> is pretty much the same:</p>
+		
+		{{ code("complex_substraction.c", "c") }}
+		
+		<div class="horizontal_split">
+			<div>
+				{{ formula("c_sub.tex") }}
+			</div>
+			<div>
+				<img src="media/c_sub.svg">
+			</div>
+		</div>
+		
+		<p>Things get sligtly complicated with <b>multiplication</b>. The trick here is that we have to multiply two imaginary numbers, and they yield a real one but with a negative sign. This is also much harder to interpret geometrically, so I didn't include that representation <i>yet</i>.</p>
+		
+		{{ code("complex_multiplication.c", "c") }}
+		
+		{{ formula("c_mul.tex") }}
+		
+		<p>Before we continue, take a look at how many real operations did these functions cost. For addition and substraction we needed <span class="plt_green">two additions</span> and <span class="plt_green">substractions</span> respectively and for multiplication we had to do <span class="plt_yellow">four real multiplications</span>, <span class="plt_green">one addition</span> and <span class="plt_green">one substraction</span>.</p>
+		
+		<p>We can do better in terms of multiplications, if we use <b>Gauss' complex multiplication algorithm</b>. With the introduction of three intermediate variables, we could reduce the number of multiplications needed to three:</p>
+		
+		{{ formula("c_mul_gauss.tex") }}
+		
+		{{ code("complex_gauss.c", "c") }}
+		
+		<p>There are a few different ways to express this due to the symmetry but we can't go below <span class="plt_yellow">three multiplications</span>. Also we had to do now <span class="plt_green">three additions</span> and <span class="plt_green">two substractions</span>, a total of eight operations instead of six. Was this tradeoff really worth it?</p>
+		
+		<p>It depends on your hardware, and you should take a look at the timings each operation takes (<a href="https://www.agner.org/optimize/instruction_tables.pdf">example</a>). But as a general thumb of rule, we can make the following observations: addition and substraction cost the same, multiplication is slower and division is even slower.</p>
+		
+		<table style="font-size: 35px;">
+			<tr><td><b>+ -</b></td><td width=200><img src="media/smiley_addsub.png" style="height: 50px;"></td></tr>
+			<tr><td><b>*</b></td><td><img src="media/smiley_mul.png" style="height: 50px;"></td></tr>
+			<tr><td><b>/</b></td><td><img src="media/smiley_div.png" style="height: 50px;"></td></tr>
+		</table>
+		
+		<p>Also for now I'll refer substraction as addition to make things easier.</p>
+		
+		<p>Finally we need to do some work to get the <b>division</b> done:</p>
+		
+		{{ formula("c_div_1.tex", amsmath=False) }}
+		
+		<p>After expanding the fraction (with the <a href="https://en.wikipedia.org/wiki/Complex_conjugate">complex conjugate</a>), the imaginary terms from the denominator cancel themselves.</p>
+		
+		{{ formula("c_div_2.tex", amsmath=False) }}
+		
+		<p>Rearranging the terms:</p>
+		
+		{{ formula("c_div_3.tex", amsmath=False) }}
+		
+		<p>And in code form:</p>
+		
+		{{ code("complex_division.c", "c") }}
+		
+		<p>This method uses <span class="plt_green">three additions</span>, <span class="plt_yellow">six multiplications</span>, and <span class="plt_red">two divisions</span>. Not the fastest method, can we make some accelerations here as well?</p>
+		
+		<div class="infobox info">
+			<p>As a side note, two of the six multiplications are squarings, which can be a little bit faster than regular multiplications.</p>
+		</div>
+		
+		<p>Only a bit, with complex division, there is some sort of complex multiplication occuring, and we can bring down its four multiplications to three:</p>
+		
+		{{ code("complex_fast_division.c", "c") }}
+		
+		<p>This method does <span class="plt_green">6 additions</span>, <span class="plt_yellow">5 multiplications</span> and <span class="plt_red">2 divisions</span>.</p>
+		
+		<h2>Polar form</h2>
+		
+		<p>We can also rewrite our complex numbers into polar coordiantes. Instead of representing them with real and imaginary values, we can define a length and angle for each complex number:</p>
+		
+		<figure>
+			<canvas id="polar_complex"></canvas>
+		</figure>
+		
+		<p>We can present this new form with sines and cosines:</p>
+		
+		{{ formula("polar_def.tex") }}
+		
+		<p>Where <i>r</i> and <i>θ</i> can be obtained from (using <a href="https://en.wikipedia.org/wiki/Atan2">atan2</a> here):</p>
+		
+		{{ formula("polar_rtheta.tex") }}
+		
+		<p>And we can use <a href="https://en.wikipedia.org/wiki/Euler%27s_formula">Euler's formula</a> to simplify our notation and this allows for the use of nice exponentional identities.</p>
+		
+		{{ formula("polar_euler.tex") }}
+		
+		<p>You are probably already familiar with this. The emphasis in this article is on how can this form used to accelerate our computations. The good news is that complex multiplication becomes really simple, it only takes <span class="plt_yellow">one real multiplication</span> and <span class="plt_green">one addition</span>:</p>
+		
+		{{ formula("polar_mul.tex") }}
+		
+		<p>Also the division simplifies as well to <span class="plt_red">one real division</span> and <span class="plt_green">one substraction</span>:</p>
+		
+		{{ formula("polar_div.tex", amsmath=False) }}
+		
+		<p>Cool, now what about addition? The bad news is that you can't really do that withoud converting back to rectangular form. And this conversion really takes its toll: <b>two squarings</b>, a <b>square root</b>, an <b>arctangent</b> one way, <b>sines</b> and <b>cosines</b> with <b>multiplications</b> backwards. These operations are usually much slower than the regular arithmetic ones, so in practice where you have to do additions as well, this form is rarely used.</p>
+		
+		<p>If you happen to have a use case where lots of repeated complex multiplications take place without any additions meanwhile, this might be useful, but otherwise you are better off with the regular form.</p>
+		
+		<h2>Endnote</h2>
+		
+		<p>This introduction is far from complete. There are a lot of topics not covered here: complex numeral systems, hardware implementations and considerations, possible parallelization, etc. Originally I planned to cover all of them in a single article, but they turned out to be way more complex (haha) than I thought. I had to do a split, which resulted in this writing being maybe trivially simple.</p>
+		
+		
+	</article>
+	<script src="tscript.js"></script>
+</body>
+</html>
