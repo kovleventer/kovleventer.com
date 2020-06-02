@@ -160,9 +160,51 @@
 		
 		<p>If you happen to have a use case where lots of repeated complex multiplications take place without any additions meanwhile, this might be useful, but otherwise you are better off with the regular form.</p>
 		
+		<h2>SIMD</h2>
+		
+		<p>There are other things to consider when evaluating performance, and one of them is parallelization. For addition and substraction it is easy to see, that the real and imaginary parts are independent from each other, and so they can be calculated concurrently. For multiplication, this is not so trivial. The naive version with four multiplications has a concurrency diagram with depth two:</p>
+		
+		<img src="media/con_naive.svg">
+		
+		<p>Whereas the similar diagram for Gauss' method is one step deeper:</p>
+		
+		<img style="max-height: none;" src="media/con_gauss.svg">
+		
+		<p>In conclusion: if we have four multiplier units available, we can do multiplication in only two steps. We can use the <b>single instruction, multiple data</b> ( <a href="https://en.wikipedia.org/wiki/SIMD">SIMD</a>) extensions in x86 to accomplish something like that. The following code loads the four floats into a single 128 bit register specifically designed for vector operations (4 times sizeof(float), which is 32 equals to 128), then breaks them into two regiters. Both contains the original complex numbers, but in a redundant manner, the variable names <i>aabb</i> and <i>cdcd</i> indicate how they are stored. Of course this shuffling is redundant, if you can load the values into the registers this way in the first place.</p>
+		
+		<p>The key method is the multiplication, for which SSE provides a single instruction that does elementwise multiplication. The remaining addition and substraction is done by hand, which is a pretty ugly way, but SIMD operations were not designed with horizontal (inter-register) operations in mind.</p>
+		
+		{{ code("simd_one.c", "c") }}
+		
+		<p>We can eliminate these manual operations, if we use the <a href="https://www.felixcloutier.com/x86/addsubps">ADDSUBPS</a> instruction, which computes addition and substraction in an alternating manner alongside the vector. The fully utilize the 128 bit registers, we can process two complex multiplications instead of just one. This requires an additional SIMD multiplication, but hey, this tradeoff seems nice:</p>
+		
+		{{ code("simd_two.c", "c") }}
+		
+		<p>And finally we can simply use the raw capabilities of parallelization and use the registers, as they were regular floats. Process 4 complex multiplications at the same time the naive way:</p>
+		
+		{{ code("simd_four.c", "c") }}
+		
+		<p>I then benchmarked them on my Intel Core i5-4590S for 100 million iterations, and the results were somewhat interesting:</p>
+		
+		<table style="width: 70%;">
+		<tr><th>Method</th><th>100M iterations</th><th>400M numbers</th></tr>
+		<tr><td>Manual add</td><td>1.642s</td><td>6.502s</td></tr>
+		<tr><td>Two at the same time</td><td>1.912s</td><td>3.845s</td></tr>
+		<tr><td>Four at the same time</td><td>2.377s</td><td>2.377s</td></tr>
+		</table>
+		
+		<p>From the first two columns, the first method seemed the fastest. BUT if we factor in that the last method did process four times as much numbers as the first one, it paints a much different story. Seems like no clever tricking can accelerate the process this way. I also tried Gauss' method and the <a href="https://en.wikipedia.org/wiki/FMA_instruction_set">FMA</a> instruction set for even less instructions, but they yielded the same results as the naive method.</p>
+		
 		<h2>Endnote</h2>
 		
-		<p>This introduction is far from complete. There are a lot of topics not covered here: complex numeral systems, hardware implementations and considerations, possible parallelization, etc. Originally I planned to cover all of them in a single article, but they turned out to be way more complex (haha) than I thought. I had to do a split, which resulted in this writing being maybe trivially simple.</p>
+		<p>This introduction is far from complete. There are a lot of topics not covered here, complex numeral systems for example. You can also play around with these methods, and who knows, maybe you can find a more optimized complex multiplication or division method.</p>
+		
+		<h2>Sources</h2>
+		
+		<ol>
+			<li>Aleksandr Cariow, An algorithm for dividing two complex numbers (<a href="https://arxiv.org/abs/1608.07596">arXiv</a>)</li>
+			<li>Intel® 64 and IA-32 Architectures Optimization Reference Manual</li>
+		</ol>
 		
 		
 	</article>
