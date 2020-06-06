@@ -170,7 +170,7 @@
 		
 		<img style="max-height: none;" src="media/con_gauss.svg">
 		
-		<p>In conclusion: if we have four multiplier units available, we can do multiplication in only two steps. We can use the <b>single instruction, multiple data</b> ( <a href="https://en.wikipedia.org/wiki/SIMD">SIMD</a>) extensions in x86 to accomplish something like that. The following code loads the four floats into a single 128 bit register specifically designed for vector operations (4 times sizeof(float), which is 32 equals to 128), then breaks them into two regiters. Both contains the original complex numbers, but in a redundant manner, the variable names <i>aabb</i> and <i>cdcd</i> indicate how they are stored. Of course this shuffling is redundant, if you can load the values into the registers this way in the first place.</p>
+		<p>In conclusion: if we have four multiplier units available, we can do multiplication in only two steps. We can use the <b>single instruction, multiple data</b> (<a href="https://en.wikipedia.org/wiki/SIMD">SIMD</a>) extensions in x86 to accomplish something like that. The following code loads the four floats into a single 128 bit register specifically designed for vector operations (4 times sizeof(float), which is 32 equals to 128), then breaks them into two regiters. Both contains the original complex numbers, but in a redundant manner, the variable names <i>aabb</i> and <i>cdcd</i> indicate how they are stored. Of course this shuffling is redundant, if you can load the values into the registers this way in the first place.</p>
 		
 		<p>The key method is the multiplication, for which SSE provides a single instruction that does elementwise multiplication. The remaining addition and substraction is done by hand, which is a pretty ugly way, but SIMD operations were not designed with horizontal (inter-register) operations in mind.</p>
 		
@@ -197,7 +197,7 @@
 		
 		<h2>Endnote</h2>
 		
-		<p>This introduction is far from complete. There are a lot of topics not covered here, complex numeral systems for example. You can also play around with these methods, and who knows, maybe you can find a more optimized complex multiplication or division method.</p>
+		<p>This introduction is far from complete, there are a lot of topics not covered here, complex numeral systems for example. You can also play around with these methods, and who knows, maybe you can find a more optimized complex multiplication or division method.</p>
 		
 		<h2>Sources</h2>
 		

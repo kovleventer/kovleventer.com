@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p>Fourier transforms are used to transform a signal from time range to frequency range. They operate with complex values, and take complex numbers as inputs, even though in most cases our input will consist of real numbers. If we supply zero as each imaginary input, the result will be symmetrical, and roughly half of the resulting numbers will not give us any more information. Can we exploit this redundancy for speedups?</p>
+		
+		<h2>Naive removals</h2>
+		
+		<p>Take a look at a DIT butterfly diagram for the radix two case. We can remove everything which is connected to the last half (F(5), F(6) and F(7), but not F(4), cause it is the <a>https://en.wikipedia.org/wiki/Nyquist_frequency</a> and has no pair), but we can only spare those calculations, whose are not needed anywhere else:</p>
+		
+		<img src="media/butterfly_dit_rem.svg">
+		
+		<p>A radix 2 FFT takes N/2*log(N) multiplications and N*log(N) additions/substractions, for N=8, this means 12 and 24 respectively. With this method shown above we managed to reduce the number of additions taken by 3, or in the more general case N/2-1. It's not much sadly, and as N increases this gain will only get less significant.</p>
+		
+		<p>Things only get a bit better in DIF (decimation in frequency) case:</p>
+		
+		<img src="media/butterfly_dif_rem.svg">
+		
+		<p>Now we could reduce the multiplication count by 3 as well. But in conclusion, these methods are disappointingly ineffective, they aren't close to the two times speedup, which I would have intuitively guessed, which means we have to look in an other direction.</p>
+		
+		<div class="infobox info">
+			<p>You can actually achieve similar results with the first (DIT) case too, if you play around with the <i>F</i>s you want to remove; for example F(1), F(5) and F(6).</p>
+		</div>
+		
+		<h2>Odds and evens</h2>
+		
+		<p>What if instead of accelerating a singe FFT, we would do two transformations at the same time by packing two real valued inputs together? The easiest way to do this is to pack the second signal into the imaginary components, or in other words, multiply it by <i>j</i>, and add to the first one.</p>
+		
+		{{ formula("pack.tex") }}
+		
+		<p>Discrete Fourier transform is essentially a matrix multiplication, which is a linear operation. Thus we can write:</p>
+		
+		{{ formula("pack_dft.tex") }}
+		
+		<p>This means that the results will be packed in the way and can be separated later, but tells us nothing about how should we do this separation. In order to accomplish this, we'll need to look around the odd even properties of the functions.</p>
+		
+		<div class="horizontal_split">
+			<div><img src="media/even_function.svg"></div>
+			<div><img src="media/odd_function.svg"></div>
+		</div>
+		
+		<p>A function is <b>even</b>, if it is symmetrical to the y axis, or in other terms, <i>f(x) = f(-x)</i>. Similarly a function is <b>odd</b>, if it is symmetrical to the origin, in other terms, <i>f(x) = -f(-x)</i>. Why are they useful? Because first, they transform very nicely, and second, every function can be decomposed into odd and even parts. The method for the second statement is relatively easy:</p>
+		
+		{{ formula("oddeven_1.tex") }}
+		
+		<p>We can write something similar for the opposite side of <i>f</i>:</p>
+		
+		{{ formula("oddeven_2.tex") }}
+		
+		<p>Now we have two equatations and two unknowns, something we can solve:<p>
+		
+		{{ formula("oddeven_3.tex", amsmath=False) }}
+		
+		{{ formula("oddeven_4.tex", amsmath=False) }}
+		
+		<p><b>Hey hey hey! How can I use something like f(-x), if all I have is an array indexed from zero?</b> Well, the Discrete Fourier transform assumes that our function is periodic, and it's inter- and extrapolated curve will also act in a periodic manner. If we extended the array notation, f[N] would be the same as f[0], where N is the length of our array. That means we can utilize modular arithmetic to get those indices:</p>
+		
+		{{ formula("oddeven_array.tex") }}
+		
+		<p>I've never seen this mod expression in the texts I've browsed through, they've just simply added N to -x. This is also correct, except for index 0, so you have to be careful:</p>
+		
+		{{ formula("oddeven_array_plus.tex") }}
+		
+		<p>Now we can split arrays into odd and even parts as well. The next question is: how does Fourier transform affects purely odd and even functions? This transform decomposes signals into <b>sines</b> and <b>cosines</b>, and it's not hard to see that sines are odd functions and cosines are even. The inverse Fourier transform reverses this step, but the inverse has a more intuitive meaning to it, it's the synthesis, when the components are added together.</p>
+		
+		<p>If we accumulate pure cosine waves which are even, the result will be even as well, and the same thing can be said for sines. Since the odd-even decomposition is unambiguous, a <b>purely even</b> function will yield a <b>real only</b> signal in the frequency range, as reals correspond to cosines. In the same manner, <b>purely odd</b> functions will result in a <b>purely imaginary</b> frequency range.</p>
+		
+		<p>We can also define oddity for imaginary signals, and the transforms are easy, since the DFT is a linear operation, all it takes is to multiply it by <i>j</i> in the end. <b>Imaginary even</b> functions will have an <b>imaginary</b> frequency range, and <b>imaginary odd</b> functions will have a <b>real</b> frequency range.</p>
+		
+		<p>To sum it up, this is what we have now in terms of <span class="plt_blue">odds</span> and <span class="plt_red">evens</span>, <span class="plt_green">reals</span> and <span class="plt_yellow">imaginaries</span>:</p>
+		
+		<img src="media/rieo_question.svg">
+		
+		<p>We only need to figure out now, how the transformed signals act in terms of oddities. Solving for the real case is sufficient, since the imaginary ones will be the same, multiplying by <i>j</i> does not affect oddity. The proof for that is more formal. Let <i>f(x)</i> denote the signal in the time domain and <i>F(X)</i> in the frequency domain. The DFT by definition is:</p>
+		
+		{{ formula("dft_def.tex", amsmath=False) }}
+		
+		<p>We can also express <i>F[-X]</i> by this:</p>
+		
+		{{ formula("dft_minusx.tex", amsmath=False) }}
+		
+		<p>Our goal is to get back the original formula. Assuming <i>f(x)</i> is <b>even</b>:</p>
+		
+		{{ formula("dft_even.tex", amsmath=False) }}
+		
+		<p>The ordering in the summation has changed, but it does not affect our results. If integrals and variable renaming makes more sense to you, <a href="https://math.stackexchange.com/questions/184332/fourier-transform-of-even-odd-function">here's</a> the proof for the continous case.</p>
+
+		<p>We can do the same for <b>odds</b>, and as a result, we can see that the Fourier transform preserves oddity regardless of it being real or imaginary:</p>
+		
+		{{ formula("dft_odd.tex", amsmath=False) }}
+		
+		<p>No more question marks in our table anymore:<p>
+		
+		<img src="media/rieo.svg">
+		
+	</article>
+</body>
+</html>
