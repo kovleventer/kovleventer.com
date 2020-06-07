@@ -15,7 +15,7 @@
 		
 		<h2>Naive removals</h2>
 		
-		<p>Take a look at a DIT butterfly diagram for the radix two case. We can remove everything which is connected to the last half (F(5), F(6) and F(7), but not F(4), cause it is the <a>https://en.wikipedia.org/wiki/Nyquist_frequency</a> and has no pair), but we can only spare those calculations, whose are not needed anywhere else:</p>
+		<p>Take a look at a DIT butterfly diagram for the radix two case. We can remove everything which is connected to the last half (F(5), F(6) and F(7), but not F(4), cause it is the <a href="https://en.wikipedia.org/wiki/Nyquist_frequency">Nyquist frequency</a> and has no pair), but we can only spare those calculations, whose are not needed anywhere else:</p>
 		
 		<img src="media/butterfly_dit_rem.svg">
 		
@@ -72,7 +72,7 @@
 		
 		<p>Now we can split arrays into odd and even parts as well. The next question is: how does Fourier transform affects purely odd and even functions? This transform decomposes signals into <b>sines</b> and <b>cosines</b>, and it's not hard to see that sines are odd functions and cosines are even. The inverse Fourier transform reverses this step, but the inverse has a more intuitive meaning to it, it's the synthesis, when the components are added together.</p>
 		
-		<p>If we accumulate pure cosine waves which are even, the result will be even as well, and the same thing can be said for sines. Since the odd-even decomposition is unambiguous, a <b>purely even</b> function will yield a <b>real only</b> signal in the frequency range, as reals correspond to cosines. In the same manner, <b>purely odd</b> functions will result in a <b>purely imaginary</b> frequency range.</p>
+		<p>If we accumulate pure cosine waves which are even, the result will be even as well, and the same thing can be said for sines and odds. Since the odd-even decomposition is unambiguous, a <b>purely even</b> function will yield a <b>real only</b> signal in the frequency range, as reals correspond to cosines. In the same manner, <b>purely odd</b> functions will result in a <b>purely imaginary</b> frequency range.</p>
 		
 		<p>We can also define oddity for imaginary signals, and the transforms are easy, since the DFT is a linear operation, all it takes is to multiply it by <i>j</i> in the end. <b>Imaginary even</b> functions will have an <b>imaginary</b> frequency range, and <b>imaginary odd</b> functions will have a <b>real</b> frequency range.</p>
 		
@@ -101,6 +101,75 @@
 		<p>No more question marks in our table anymore:<p>
 		
 		<img src="media/rieo.svg">
+		
+		<p>To use this in practice, let's recap how our packed real signals (<i>x(t)</i> and <i>y(t)</i>) look like:</p>
+		
+		{{ formula("pack.tex") }}
+		
+		<p>After transformation:</p>
+		
+		{{ formula("pack_dft_2.tex") }}
+		
+		<p>We have to be careful, <i>X(T)</i> is <b>NOT</b> the transform of <i>x(t)</i> and similarly <i>Y(T)</i> is <b>NOT</b> the transform of <i>y(t)</i>. To extract the transform of <i>x(t)</i>, we need to sum up the <span class="plt_green">real</span>-<span class="plt_red">even</span>, and the <span class="plt_yellow">imaginary</span>-<span class="plt_blue">odd</span> parts. Let <i>Z_x(T)</i> denote this:</p>
+		
+		{{ formula("pack_even.tex", amsmath=False) }}
+		
+		<p>We can make simplifications by extracting the denominators:</p>
+		
+		{{ formula("pack_even_2.tex", amsmath=False) }}
+		
+		<p>We can see our original <i>Z(T)</i> on the left side, and the <a href="https://en.wikipedia.org/wiki/Complex_conjugate">complex conjugate</a> of <i>Z(T)</i> on the right side:</p>
+		
+		{{ formula("pack_even_3.tex", amsmath=False) }}
+		
+		<p>We can do something similar for <i>Z_y(T)</i>, in that case we need to sum up the <span class="plt_green">real</span>-<span class="plt_blue">odd</span>, and the <span class="plt_yellow">imaginary</span>-<span class="plt_red">even</span> parts. Note the <i>j</i> in the denominators: we multiplied <i>y(t)</i> by <i>j</i> in the first place, now we have to reverse this operation.</p>
+		
+		{{ formula("pack_odd.tex", amsmath=False) }}
+		
+		<p>After extraction:</p>
+		
+		{{ formula("pack_odd_2.tex", amsmath=False) }}
+		
+		<p>And as the final result we have to substract this conjugate instead of adding it:</p>
+		
+		{{ formula("pack_odd_3.tex", amsmath=False) }}
+		
+		<p>You can also simplify this division by <i>j</i> to a multiplication with <i>-j</i>.</p>
+		
+		<p>To see this in practice, here's an example in python using numpy, and its existing fft functions:</p>
+		
+		{{ code("pack_two_fft.py", "python") }}
+		
+		<p>As you can see, the results match, and this method works indeed.</p>
+		
+		<h2>Splitting and packing a single FFT</h2>
+		
+		<p>The radix 2 FFT had the following outline:</p>
+		
+		<ol>
+			<li>Split the data into odd and even indices.</li>
+			<li>Calculate two separate FFTs on the subarrays.</li>
+			<li>Merge them together by some addition, substraction and twiddle factors.</li>
+		</ol>
+		
+		<p>Judgng from the previous method, it seems logical, that we could utlize this to complete the first two steps. We can split our original array (whose size must be divisible by 2), and than pack the even or odd indices into the imaginary part of the input. Assuming we already have <i>Z_x</i> and <i>Z_y</i>, we can get the full, length N spectrum, <i>Z_all</i>, by: (if you don't understand this, take a look at the DIT butterfly diagram shown at the very beginning of this article)</p>
+		
+		{{ formula("split_pack_1.tex") }}
+		
+		<p>The semicolon marks concatenation here and W is the N/2 sized vector of the twiddle factors of N. An example implementation in python and numpy provided below:</p>
+		
+		{{ code("split_two_fft.py", "python") }}
+		
+		<p>Of course, this python example does not show the full picture. If you want to implement this method efficiently, you will also have to take various things into consideration like initial permutations (how bitwise reverse index works here), how to utilize as little space as possible, since these concatenations allocate new arrays each time, or how to access Z in multiple ways without creating a new array from it using <i>flip</i>, <i>roll</i> and <i>conj</i>.</p>
+		
+		<h2>Sources</h2>
+		
+		<ol>
+			<li>Ronald N. Bracewell: The Fourier Transform and its Applications third edition</li>
+			<li>H. Sorenson et al.: Real-Valued Fast Fourier Transform Algorithms</li>
+			<li>Richard C. Singleton: On Computing The Fast Fourier Transform</li>
+			<li>Robert Matusiak: Implementing Fast Fourier Transform Algorithms of Real-Valued Sequences With the TMS320 DSP Platform</li>
+		</ol>
 		
 	</article>
 </body>
