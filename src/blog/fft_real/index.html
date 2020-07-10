@@ -74,6 +74,8 @@
 		
 		<p>If we accumulate pure cosine waves which are even, the result will be even as well, and the same thing can be said for sines and odds. Since the odd-even decomposition is unambiguous, a <b>purely even</b> function will yield a <b>real only</b> signal in the frequency range, as reals correspond to cosines. In the same manner, <b>purely odd</b> functions will result in a <b>purely imaginary</b> frequency range.</p>
 		
+		<img src="media/rieo_question_2.svg">
+		
 		<p>We can also define oddity for imaginary signals, and the transforms are easy, since the DFT is a linear operation, all it takes is to multiply it by <i>j</i> in the end. <b>Imaginary even</b> functions will have an <b>imaginary</b> frequency range, and <b>imaginary odd</b> functions will have a <b>real</b> frequency range.</p>
 		
 		<p>To sum it up, this is what we have now in terms of <span class="plt_blue">odds</span> and <span class="plt_red">evens</span>, <span class="plt_green">reals</span> and <span class="plt_yellow">imaginaries</span>:</p>
@@ -97,6 +99,10 @@
 		<p>We can do the same for <b>odds</b>, and as a result, we can see that the Fourier transform preserves oddity regardless of it being real or imaginary:</p>
 		
 		{{ formula("dft_odd.tex", amsmath=False) }}
+		
+		<div class="infobox info">
+			<p>This is a suprisingly dry proof, as this statement itself is actually simpler than the previous one. Whether a transform is real or imaginary depended on the realness and odditiy of the original signal, where now the only statement is that the Fourier transform keeps oddity. I couldn't find a more intuitive meaning behind this, so if you have something that's easier to grasp, please let me know.</p>
+		</div>
 		
 		<p>No more question marks in our table anymore:<p>
 		
