@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" type="text/css" href="/style_blue.css">
+	<link rel="stylesheet" type="text/css" href="media/highlight.css">
+	<meta charset="UTF-8">
+</head>
+<body>
+	{% include "header.html" %}
+	<article>
+		<h1>{{ title }}</h1>
+		
+		<p>Once I stumbled upon an interesting product, a massage device, which was powered solely by USB. Furthermore, it used a Micro-B plug, and was supposed to be connected to a smartphone, via <a href="https://en.wikipedia.org/wiki/USB_On-The-Go">OTG</a> (imagine how much of a power drain that can be!). Sadly at the time of the writing of this article I couldn't find this product available anywhere on the internet, and their <a href="http://iplushub.isso.cool/emassage/">site</a> seemed to be down as well. The only available information is their <a href="https://play.google.com/store/apps/details?id=com.developer.cd432rs.eMassage">companion app</a> on Google Play.</p>
+		
+		<p>At first glance, this might seem your average dirt cheap chinese setup: if the hardware won't short and fry itself, then the app will steal and sell all of your available data, so I decided to mitigate at least the second risk and find out how the app works; more precisely, how it communicates with the end device. With reverese engineering such things, we have basically two options:</p>
+		
+		<ul>
+			<li>Sniff and intercept all traffic, and analyse them with a tool (for example with Wireshark)</li>
+			<li>Reverse engineer the master intelligence and driver</li>
+		</ul>
+		
+		<p>USB Micro female to USB male adapters were surprisingly hard to come by, so I decided on the second option. Android apps are generally easy to decompile and modify, so after using the <a href="https://medium.com/@sandeepcirusanagunla/decompile-and-recompile-an-android-apk-using-apktool-3d84c2055a82">apktool-dex2jar-jdgui</a> trio, I had something which closely resembled to source code.</p>
+		
+		<p>The app was partially obfuscated, but after a glance at the package names, I could narrow down where most of the driver logic would be:<p>
+		
+		<p><span class="mono">com.developer.cd432rs.eMassage.devicecontrol.UsbControlService</span></p>
+		
+		<p><a href="https://developer.android.com/guide/topics/connectivity/usb/host">Android USB host</a> has a pretty well defined interface, so I could further narrow down my search knowing what transfer methods are present there.</p>
+		
+		{{ code("rev_ctrans.java", "java") }}
+		
+		<p>If you take a look at the <a href="https://developer.android.com/reference/android/hardware/usb/UsbDeviceConnection#controlTransfer(int,%20int,%20int,%20int,%20byte[],%20int,%20int)">documentation</a>, you can treat the first four magic numbers... well as magic numbers; only the first one has a <a href="https://www.beyondlogic.org/usbnutshell/usb6.shtml">bitfield-y</a> meaning behind it. The next two parameters specify the sent data and its length, the last one is timeout, which is irrelevant in this case. To sum it up:</p>
+		
+		<table>
+			<tr><td>Transfer type</td><td>Control</td></tr>
+			<tr><td>bmRequestType</td><td>33 (H2D, Class, Interface)</td></tr>
+			<tr><td>bRequest</td><td>9</td></tr>
+			<tr><td>wValue</td><td>0x0301 (769)</td></tr>
+			<tr><td>wIndex</td><td>0x0100 (256)</td></tr>
+		</table>
+		
+		<p>Also this app has most of its log messages intact, so with <b>adb</b>, you can log the data of each sent command, as <i>p()</i> is basically a hexdump method:</p>
+		
+		{{ code("rev_dump.java", "java") }}
+		
+		<p>The next question is: where did this <i>this.n</i> come from. It's not a hard question, and the log messages trivialize it even further. Here's the init method:</p>
+		
+		{{ code("rev_init.java", "java") }}
+		
+		<p>It's a really short protocol, so take a look what each byte does (converted to hex):</p>
+		
+		<p><span class="mono"><span class="strong_highlight_1">05 76</span> <span class="strong_highlight_2">02</span> <span class="strong_highlight_3">00</span> <span class="strong_highlight_4">02</span> <span class="strong_highlight_5">03</span><span></p>
+		
+		<ul>
+			<li><span class="strong_highlight_1">05 76</span>: <b>Constant magic values</b>, I've never seen occurances in the code, where they would have changed.</li>
+			<li><span class="strong_highlight_2">02</span>: <b>Mode</b>, the app defines 6 modes, of which the first three are valid only.</li>
+			<img src="media/app_modes.png" style="width: 50%;">
+			
+			{{ code("rev_mode.java", "java") }}
+			<p>The rest three are mixed modes, which are updated periodically with a timer in <i>com.developer.cd432rs.eMassage.a.a.java</i>.</p>
+			{{ code("rev_mixmode.java", "java") }}
+			
+			<p>The actual update logic is as ugly as you would expect from an obfuscated snippet, I won't paste it here, but you can find it <a href="media/rev_mmode.java">there</a>.</p>
+			
+			<li><span class="strong_highlight_3">00</span>: <b>Timer</b> in minutes, not sure what effect it has, since the app already has a software timer and leaving it's value as zero works as well.</li>
+			
+			{{ code("rev_timer.java", "java") }}
+			<p>This function gets called from <i>com.developer.cd432rs.eMassage.devicecontrol.e.java</i>.</p>
+			<li><span class="strong_highlight_4">02</span>: <b>Strength</b> from 0 to 12, larger values have no effect.</li>
+			{{ code("rev_str.java", "java") }}
+			<li><span class="strong_highlight_5">03</span>: <b>Status</b>, one means pause, two means start, three means stop.</li>
+			{{ code("rev_status.java", "java") }}
+		</ul>
+		
+		<p>With that information, you can probably write a similar controller app for this device now. Reverse engineering it was surprisingly easy but a fun experience neverthless.</p>
+		
+	</article>
+</body>
+</html>
