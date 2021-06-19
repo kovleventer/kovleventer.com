@@ -58,9 +58,9 @@
 		
 		<p>Now we have two equatations and two unknowns, something we can solve:<p>
 		
-		{{ formula("oddeven_3.tex", amsmath=False) }}
+		{{ formula("oddeven_3.tex") }}
 		
-		{{ formula("oddeven_4.tex", amsmath=False) }}
+		{{ formula("oddeven_4.tex") }}
 		
 		<p><b>Hey hey hey! How can I use something like f(-x), if all I have is an array indexed from zero?</b> Well, the Discrete Fourier transform assumes that our function is periodic, and it's inter- and extrapolated curve will also act in a periodic manner. If we extended the array notation, f[N] would be the same as f[0], where N is the length of our array. That means we can utilize modular arithmetic to get those indices:</p>
 		
@@ -84,21 +84,21 @@
 		
 		<p>We only need to figure out now, how the transformed signals act in terms of oddities. Solving for the real case is sufficient, since the imaginary ones will be the same, multiplying by <i>j</i> does not affect oddity. The proof for that is more formal. Let <i>f(x)</i> denote the signal in the time domain and <i>F(X)</i> in the frequency domain. The DFT by definition is:</p>
 		
-		{{ formula("dft_def.tex", amsmath=False) }}
+		{{ formula("dft_def.tex") }}
 		
 		<p>We can also express <i>F[-X]</i> by this:</p>
 		
-		{{ formula("dft_minusx.tex", amsmath=False) }}
+		{{ formula("dft_minusx.tex") }}
 		
 		<p>Our goal is to get back the original formula. Assuming <i>f(x)</i> is <b>even</b>:</p>
 		
-		{{ formula("dft_even.tex", amsmath=False) }}
+		{{ formula("dft_even.tex") }}
 		
 		<p>The ordering in the summation has changed, but it does not affect our results. If integrals and variable renaming makes more sense to you, <a href="https://math.stackexchange.com/questions/184332/fourier-transform-of-even-odd-function">here's</a> the proof for the continous case.</p>
 
 		<p>We can do the same for <b>odds</b>, and as a result, we can see that the Fourier transform preserves oddity regardless of it being real or imaginary:</p>
 		
-		{{ formula("dft_odd.tex", amsmath=False) }}
+		{{ formula("dft_odd.tex") }}
 		
 		<div class="infobox info">
 			<p>This is a suprisingly dry proof, as this statement itself is actually simpler than the previous one. Whether a transform is real or imaginary depended on the realness and odditiy of the original signal, where now the only statement is that the Fourier transform keeps oddity. I couldn't find a more intuitive meaning behind this, so if you have something that's easier to grasp, please let me know.</p>
@@ -118,27 +118,27 @@
 		
 		<p>We have to be careful, <i>X(T)</i> is <b>NOT</b> the transform of <i>x(t)</i> and similarly <i>Y(T)</i> is <b>NOT</b> the transform of <i>y(t)</i>. To extract the transform of <i>x(t)</i>, we need to sum up the <span class="plt_green">real</span>-<span class="plt_red">even</span>, and the <span class="plt_yellow">imaginary</span>-<span class="plt_blue">odd</span> parts. Let <i>Z_x(T)</i> denote this:</p>
 		
-		{{ formula("pack_even.tex", amsmath=False) }}
+		{{ formula("pack_even.tex") }}
 		
 		<p>We can make simplifications by extracting the denominators:</p>
 		
-		{{ formula("pack_even_2.tex", amsmath=False) }}
+		{{ formula("pack_even_2.tex") }}
 		
 		<p>We can see our original <i>Z(T)</i> on the left side, and the <a href="https://en.wikipedia.org/wiki/Complex_conjugate">complex conjugate</a> of <i>Z(T)</i> on the right side:</p>
 		
-		{{ formula("pack_even_3.tex", amsmath=False) }}
+		{{ formula("pack_even_3.tex") }}
 		
 		<p>We can do something similar for <i>Z_y(T)</i>, in that case we need to sum up the <span class="plt_green">real</span>-<span class="plt_blue">odd</span>, and the <span class="plt_yellow">imaginary</span>-<span class="plt_red">even</span> parts. Note the <i>j</i> in the denominators: we multiplied <i>y(t)</i> by <i>j</i> in the first place, now we have to reverse this operation.</p>
 		
-		{{ formula("pack_odd.tex", amsmath=False) }}
+		{{ formula("pack_odd.tex") }}
 		
 		<p>After extraction:</p>
 		
-		{{ formula("pack_odd_2.tex", amsmath=False) }}
+		{{ formula("pack_odd_2.tex") }}
 		
 		<p>And as the final result we have to substract this conjugate instead of adding it:</p>
 		
-		{{ formula("pack_odd_3.tex", amsmath=False) }}
+		{{ formula("pack_odd_3.tex") }}
 		
 		<p>You can also simplify this division by <i>j</i> to a multiplication with <i>-j</i>.</p>
 		

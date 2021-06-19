@@ -102,15 +102,15 @@
 		
 		<p>Finally we need to do some work to get the <b>division</b> done:</p>
 		
-		{{ formula("c_div_1.tex", amsmath=False) }}
+		{{ formula("c_div_1.tex") }}
 		
 		<p>After expanding the fraction (with the <a href="https://en.wikipedia.org/wiki/Complex_conjugate">complex conjugate</a>), the imaginary terms from the denominator cancel themselves.</p>
 		
-		{{ formula("c_div_2.tex", amsmath=False) }}
+		{{ formula("c_div_2.tex") }}
 		
 		<p>Rearranging the terms:</p>
 		
-		{{ formula("c_div_3.tex", amsmath=False) }}
+		{{ formula("c_div_3.tex") }}
 		
 		<p>And in code form:</p>
 		
@@ -154,7 +154,7 @@
 		
 		<p>Also the division simplifies as well to <span class="plt_red">one real division</span> and <span class="plt_green">one substraction</span>:</p>
 		
-		{{ formula("polar_div.tex", amsmath=False) }}
+		{{ formula("polar_div.tex") }}
 		
 		<p>Cool, now what about addition? The bad news is that you can't really do that withoud converting back to rectangular form. And this conversion really takes its toll: <b>two squarings</b>, a <b>square root</b>, an <b>arctangent</b> one way, <b>sines</b> and <b>cosines</b> with <b>multiplications</b> backwards. These operations are usually much slower than the regular arithmetic ones, so in practice where you have to do additions as well, this form is rarely used.</p>
 		
@@ -179,7 +179,7 @@
 			
 			<p>Or if you like the simplified notation with sums:</p>
 			
-			{{ formula("base_short.tex", amsmath=False) }}
+			{{ formula("base_short.tex") }}
 			
 			<p>So for example the number 1234 is made up from 1*1000 + 2*100 + 3*10 + 4*1. This also gives us a method for base conversion, but that is a different story.</p>
 			

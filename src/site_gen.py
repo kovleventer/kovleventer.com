@@ -23,7 +23,7 @@ def get_blog_entries():
         config = os.path.join(entry, "config.yml")
         if os.path.exists(config):
             with open(config) as f:
-                cfg = yaml.load(f)
+                cfg = yaml.load(f, Loader=yaml.SafeLoader)
                 if cfg["published"]:
                     entries.append({"name": cfg['name'], "date": cfg['date'], "link": "blog/" + entry.split("/")[-1]})
         else:

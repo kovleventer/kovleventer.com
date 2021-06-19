@@ -124,17 +124,17 @@
 		
 		<p>We can normalize A and B, by dividing them with the square root of the sum of the two terms squared</p>
 		
-		{{ formula("expo_sin_cos_2.tex", 24, amsmath=False) }}
+		{{ formula("expo_sin_cos_2.tex", 24) }}
 		
-		<p>Let's use <i>C</i> as a shorthand for {{ formula("expo_sin_cos_3.tex", 18, inline=True, amsmath=False) }}, and since the sum of <i>A/C</i> and <i>B/C</i> squared is 1 now, we can find a φ (greek phi) such as</p>
+		<p>Let's use <i>C</i> as a shorthand for {{ formula("expo_sin_cos_3.tex", 18, inline=True) }}, and since the sum of <i>A/C</i> and <i>B/C</i> squared is 1 now, we can find a φ (greek phi) such as</p>
 		
-		{{ formula("expo_sin_cos_4.tex", 24, amsmath=False) }}
+		{{ formula("expo_sin_cos_4.tex", 24) }}
 		
-		{{ formula("expo_sin_cos_5.tex", 24, amsmath=False) }}
+		{{ formula("expo_sin_cos_5.tex", 24) }}
 		
 		<p>Dividing the second equatation with the first, the <i>C</i>s cancel out and we are left with a nicer formula</p>
 		
-		{{ formula("expo_sin_cos_6.tex", 24, amsmath=False) }}
+		{{ formula("expo_sin_cos_6.tex", 24) }}
 		
 		<p>And now we can get the value of φ by plugging <i>B/A</i> into the <a href="https://en.wikipedia.org/wiki/Inverse_trigonometric_functions">inverse</a> of tangent (also don't forget to check if <i>A</i> is zero). Our signal looks like this now:<p>
 		
@@ -264,7 +264,7 @@
 		
 		<p><b>How does any of the above help in finding the inverse of this matrix?</b> Well, I said earlier that the matrix is symmetric, which means that I can divide a row with a column, a column with a row or a row with a row alongside the same principles. If I were to multiply this matrix with itself, what would I get is columns multiplied by rows elementwise, than taking the sum of the resulting vector. Almost good, except as I said, we need to do a division instead of multiplication. To do this, we can define an operation called <b>conjugation</b>, which turns the exponent negative for a complex number.</p>
 		
-		{{ formula("dft_conjugate.tex", 28, amsmath=False) }}
+		{{ formula("dft_conjugate.tex", 28) }}
 		
 		<p>If we take the conjugate of the whole matrix (elementwise) and multiply it with our original matrix, this is what we get:</p>
 		
@@ -329,11 +329,11 @@
 		
 		<p>Our last graph, where we plotted the amplitudes against the frequency bins is called the <b>spectrum</b>. To be honest I haven't given a formal definition of the DFT yet, which maybe puts the resulting function in perspective. In practice, our signal is comprised of lots of samples, so when plotted, it looks like a continous signal. The same can be said for this spectrum; F(f) is just another discrete but continous looking signal. Also if you look at definitions from other sources, you'll se that they prefer the usage of sqare brackets whenever dealing with discrete signals, so do I now.</p>
 		
-		{{ formula("dft_definition.tex", 24, amsmath=False) }}
+		{{ formula("dft_definition.tex", 24) }}
 		
 		<p>And as we said we do the division by N in the inverse part.<p>
 		
-		{{ formula("dft_inverse.tex", 24, amsmath=False) }}
+		{{ formula("dft_inverse.tex", 24) }}
 		
 		<p>Summing up the symmetrical parts of the spectrum is a manual task, but don't worry, there are specific functions in most DFT/FFT libraries to help you deal with that. Here, FFT is just a fast method to calculate DFT and the <i>r</i> before that in the function name stands for real, when our signal consists of real values:</p>
 		
