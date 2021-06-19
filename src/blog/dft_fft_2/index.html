@@ -70,8 +70,8 @@
 			<p>Visually the question is: how do we get from this state <img style="height:80px" class="inline" src="media/smalldft_left.png"> to here <img style="height:80px" class="inline" src="media/smalldft_right.png">? It's easy, <b>shift it right</b>!</p>
 			
 			<p>Take a look at a non-simplified DFT matrix. What operation needs do be done to get from one element to its right neighbor?</p>
-			
-			<img src="media/dft_matrix_5.svg"> <!-- TODO khm khm-->
+
+			{{ formula("dft_matrix_5.tex") }}
 			
 			<p>Multiply it with the element in the <span class="plt_red">second column</span> and the same row! Or with the second row and the same column, it is symmetric, so it does not matter for single elements, but we are going to use this for whole columns, so stick with the first method.</p>
 			
@@ -200,7 +200,7 @@
 		
 		<p>We covered discrete and fast Fourier transforms and the most basic algorithms, but there is still room to improve. Depending on your use case, you can take a look into how these algorithms work on special sizes, how they affect and use cache optimally without misses, how to reduce the number of required multiplactions further, how to implement in this in a hardware with high efficiency, how to run them in a highly parallelised environment and so on. For now, only a few not strictly related miscellaneous topics are remaining.</p>
 		
-		<h2>Miscellaneous topics</p>
+		<h2>Miscellaneous topics</h2>
 		
 		<h3>ifft</h3>
 		

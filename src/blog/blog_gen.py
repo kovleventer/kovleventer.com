@@ -31,7 +31,7 @@ def syntax_file(filename, lang_name="", filtered_words=None):
         # TODO make this work
     return highlight(content, lexer, HtmlFormatter(cssclass="code_highlight"))
 
-def render_tex_mathjax(filename, fontsize=24, inline=False, amsmath=False):
+def render_tex_mathjax(filename, fontsize=24, inline=False):
     filename = os.path.join(folder, filename)
     content = open(filename).read()[1:-2]  # New line at the end and the $ signs TODO this should be handled better
     svg = filename.replace("src", "build")
