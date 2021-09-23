@@ -118,7 +118,7 @@
 		
 		<p>The third option is the easiest, you can compare the differences on the butterfly diagrams.</p>
 		
-		<img src="media/butterfly_dif.svg">
+		<img src="media/butterfly_dif.svg"> <!-- TODO "Depending on how the material is presented, it’s easy for a beginner to fall into the trap of believing that decimation-in-time FFTs always have their inputs bit-reversed and decimation-in-frequency FFTs always have their outputs bit-reversed."-->
 		
 		<p>This scrambling is a permutation and we could use some <a href="https://en.wikipedia.org/wiki/Permutation_matrix">permutation matrix</a>, but this would be a terrible idea. We worked so hard so far to eliminate the use of matrix multiplication, then this close to the end, we introduce a new one... no. Turns out, this permutation is not random, it is actually the <b>bit reversed order</b> of the indices. This might come as a surprise, but take a deeper look and see how each bit corresponds in terms of odds and evens.</p>
 		
